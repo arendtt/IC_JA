@@ -6,7 +6,7 @@
 
 # IDs estao trocados como enviamos para o Broad. Precisa atuazliar IDs
 
-# instalar o gatk OK
+# instalar o gatk 
 
 ## Criar uma pasta do projeto no seu home
 
@@ -17,15 +17,15 @@ wget https://github.com/broadinstitute/gatk/releases/download/4.2.0.0/gatk-4.2.0
 
 unzip gatk-4.2.0.0.zip
 cd gatk-4.2.0.0/
-./gatk # Se funcionar o programa vai rodar com as opcoes  OK
+./gatk # Se funcionar o programa vai rodar com as opcoes  
 
 # indexar o vcf. Imagina que esse arquivo é gigantesco, "indexar" em genética significa que o programinha vai criar um index para facilitar encontrar as infos mais rapidamente no arquivo. Tipo um livro
 
-./gatk IndexFeatureFile -I /home/julia.arendt/IC_JA/INPD_GenoBroad19_12.vcf.gz # cuidado com os caminhos  OK
+./gatk IndexFeatureFile -I /home/julia.arendt/IC_JA/INPD_GenoBroad19_12.vcf.gz # cuidado com os caminhos  
 
 # Separa as informações que são importantes para extrair o dado de CNV. Você pode ( e deve) estudar o que signifca cada uma dessas colunas que eu selecionei. Principalmente o BAF e LRR.
 
-./gatk VariantsToTable -V /home/julia.arendt/IC_JA/INPD_GenoBroad19_12.vcf.gz -F ID -F CHROM -F POS -GF BAF -GF LRR -O INPD_CNVs_12.vcf  #OK
+./gatk VariantsToTable -V /home/julia.arendt/IC_JA/INPD_GenoBroad19_12.vcf.gz -F ID -F CHROM -F POS -GF BAF -GF LRR -O INPD_CNVs_12.vcf  
 
 
 # trocando cabeçalhos (isso pode ser feito de uma forma mais bonita)
