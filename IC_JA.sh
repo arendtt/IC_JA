@@ -59,62 +59,54 @@ perl /home/julia.arendt/IC_JA/PennCNV-1.0.5/detect_cnv.pl -test -hmm affygw6.hmm
 
 ./filter_cnv.pl sd22_affy.rawcnv -qclogfile sd22_affy.log -qclrrsd 0.3 -qcpassout sd22_affy.qcpass -qcsumout sd22_affy.qcsum -qcnumcnv 100 -out sd22_affy.goodcnv
 
-PennCNV - controle de qualidade
+PennCNV - controle de qualidade (Malú)
 
-1. QC por amostra
+# 1. QC por amostra
 
-./filter_cnv.pl sd22_affy.rawcnv -qclogfile sd22_affy.log -qclrrsd 0.3 -qcpassout
-sd22_affy.qcpass -qcsumout sd22_affy.qcsum -qcnumcnv 100 -out sd22_affy.goodcnv
+./filter_cnv.pl sd22_affy.rawcnv -qclogfile sd22_affy.log -qclrrsd 0.3 -qcpassout sd22_affy.qcpass -qcsumout sd22_affy.qcsum -qcnumcnv 100 -out sd22_affy.goodcnv
+
+(wc) 814   5698 120141 ../gatk-4.2.0.0/sd22_affy.rawcnv
+(wc) 326  2282 48156 sd22_affy.goodcnv
 
 No R, usando o arquivo sd22_affy.qcsum. Visualização da distribuição de CNVs por pacientes
-eshg <- sd22_affy barplot(eshg$LRR_SD, ylim = c(0, 0.3), xlab = "Pacientes", ylab =
-"LRR_SD", main = "Sample QC") barplot(eshg$NumCNV, ylim = c(0,30), main = "CNVs por
-amostra", xlab = "Pacientes", ylab = "Número de CNVs" )
+eshg <- sd22_affy barplot(eshg$LRR_SD, ylim = c(0, 0.3), xlab = "Pacientes", ylab = "LRR_SD", main = "Sample QC") barplot(eshg$NumCNV, ylim = c(0,30), main = "CNVs por amostra", xlab = "Pacientes", ylab = "Número de CNVs" )
 
-2. Remover regiões ruins
-Centroméricas
+# 2. Remover regiões ruins
+
+## Centroméricas
 ./scan_region.pl sd22_affy.goodcnv cen_region -minqueryfrac 0.5 > cnvcall.cen
 fgrep -v -f cnvcall.cen sd22_affy.goodcnv > sd22_affy_cen.clean
-restantes: 898 linhas
 
-Teloméricas:
+## Teloméricas:
 ./scan_region.pl sd22_affy_cen.clean tel_region -minqueryfrac 0.5 > cnvcall.tel
 fgrep -v -f cnvcall.tel sd22_affy_cen.clean > sd22_affy_cen_tel.clean
-restantes: 889 linhas
-Duplicações segmentais, exceto 22q11.2
-./scan_region.pl sd22_affy_cen_tel.clean seg_dup_without22q112.txt -minqueryfrac
-0.5 > cnvcall.segdup fgrep -v -f cnvcall.segdup sd22_affy_cen_tel.clean >
-sd22_affy_cen_tel_segdup.clean
-restantes: 877 linhas
-Regiões de imunoglobulinas:
-./scan_region.pl sd22_affy_cen_tel_segdup.clean immuno_region -minqueryfrac
-0.5 > cnvcall.immuno fgrep -v -f cnvcall.immuno sd22_affy_cen_tel_segdup.clean
-> sd22_affy_cen_tel_segdup_immuno.clean
-restantes: 869 linhas
 
-3. Merge
-./clean_cnv.pl -signalfile ashg.329 combineseg
-sd22_affy_cen_tel_segdup_immuno.clean >
-sd22_affy_cen_tel_segdup_immuno_merged.clean
+## Duplicações segmentais, exceto 22q11.2 
+./scan_region.pl sd22_affy_cen_tel.clean seg_dup_without22q112.txt -minqueryfrac 0.5 > cnvcall.segdup 
+fgrep -v -f cnvcall.segdup sd22_affy_cen_tel.clean > sd22_affy_cen_tel_segdup.clean
+
+## Regiões de imunoglobulinas:
+./scan_region.pl sd22_affy_cen_tel_segdup.clean immuno_region -minqueryfrac 0.5 > cnvcall.immuno 
+fgrep -v -f cnvcall.immuno sd22_affy_cen_tel_segdup.clean > sd22_affy_cen_tel_segdup_immuno.clean
+
+
+# 3. Merge
+./clean_cnv.pl -signalfile ashg.329 combineseg sd22_affy_cen_tel_segdup_immuno.clean > sd22_affy_cen_tel_segdup_immuno_merged.clean
+
 signalfile: a file that contains Chr and Position for
 SNPs/markers
 Observação: fraction 0.2 (default)
-restantes: 847 linhas
 
-4. Mínimo de sondas:
+# 4. Mínimo de sondas:
 Deleções: 10 sondas
-./filter_cnv.pl -numsnp 10 -type del sd22_affy_cen_tel_segdup_immuno_merged.clean
--output sd22_affy_del.clean
-restantes apenas del: 568
+./filter_cnv.pl -numsnp 10 -type del sd22_affy_cen_tel_segdup_immuno_merged.clean -output sd22_affy_del.clean
+
 Duplicações: 20 sondas
+./filter_cnv.pl -numsnp 20 -type dup sd22_affy_cen_tel_segdup_immuno_merged.clean -output sd22_affy_dup.clean
 
-./filter_cnv.pl -numsnp 20 -type dup sd22_affy_cen_tel_segdup_immuno_merged.clean
--output sd22_affy_dup.clean
-restantes apenas dup: 58
-
-5. Juntar arquivos com deleções e duplicações:
+# 5. Juntar arquivos com deleções e duplicações:
 cat sd22_affy_del.clean sd22_affy_dup.clean > sd22_affy_del_dup.clean
-Contagem de CNVs: 626, sendo 58 duplicações e 568 deleções
+
 
 
 
