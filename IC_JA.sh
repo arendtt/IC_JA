@@ -77,6 +77,8 @@ eshg <- sd22_affy barplot(eshg$LRR_SD, ylim = c(0, 0.3), xlab = "Pacientes", yla
 ./scan_region.pl sd22_affy.goodcnv cen_region -minqueryfrac 0.5 > cnvcall.cen
 fgrep -v -f cnvcall.cen sd22_affy.goodcnv > sd22_affy_cen.clean
 
+(wc) 322  2254 47557 sd22_affy_cen.clean
+
 ## Teloméricas:
 ./scan_region.pl sd22_affy_cen.clean tel_region -minqueryfrac 0.5 > cnvcall.tel
 fgrep -v -f cnvcall.tel sd22_affy_cen.clean > sd22_affy_cen_tel.clean
