@@ -83,6 +83,8 @@ fgrep -v -f cnvcall.cen sd22_affy.goodcnv > sd22_affy_cen.clean
 ./scan_region.pl sd22_affy_cen.clean tel_region -minqueryfrac 0.5 > cnvcall.tel
 fgrep -v -f cnvcall.tel sd22_affy_cen.clean > sd22_affy_cen_tel.clean
 
+(wc)  320  2240 47266 sd22_affy_cen_tel.clean
+
 ## Duplicações segmentais, exceto 22q11.2 
 ./scan_region.pl sd22_affy_cen_tel.clean seg_dup_without22q112.txt -minqueryfrac 0.5 > cnvcall.segdup 
 fgrep -v -f cnvcall.segdup sd22_affy_cen_tel.clean > sd22_affy_cen_tel_segdup.clean
