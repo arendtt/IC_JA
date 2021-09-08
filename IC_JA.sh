@@ -100,7 +100,7 @@ SNPs/markers
 Observação: fraction 0.2 (default)
 
 # 4. Mínimo de sondas:
-Deleções: 10 sondas
+Deleções: 20 sondas
 ./filter_cnv.pl -numsnp 10 -type del sd22_affy_cen_tel_segdup_immuno_merged.clean -output sd22_affy_del.clean
 
 Duplicações: 20 sondas
@@ -108,6 +108,10 @@ Duplicações: 20 sondas
 
 # 5. Juntar arquivos com deleções e duplicações:
 cat sd22_affy_del.clean sd22_affy_dup.clean > sd22_affy_del_dup.clean
+
+# 6.Ordenar pela primeira coluna
+man sort 
+sort -rk 1 nomedoarquivo > nomedoarquivonovo_ordenado
 
 
 
