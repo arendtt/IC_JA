@@ -51,11 +51,7 @@ perl /home/julia.arendt/IC_JA/PennCNV-1.0.5/compile_pfb.pl -list IDs_INPD12 -out
 
 # daqui pra baixo você vai preciar mudar os radicais dos arquivos e com os dados da illumina
 
-perl.15(tab) detect_cnv.pl -test -hmm affygw6.hmm -pfb affyref.pfb -list eshg_signallistfile.txt -log sd22_affy.log -out sd22_affy.rawcnv ##rodar pos paiva
-
-# ou
-
-perl /home/julia.arendt/IC_JA/PennCNV-1.0.5/detect_cnv.pl -test -hmm affygw6.hmm -pfb INPD12.pfb -list IDs_INPD12 -log CNVs.log -out CNVs.rawcnv
+detect_cnv.pl -test -hmm /home/julia.arendt/IC_JA/PennCNV-1.0.5/affy/libgw6/affygw6.hmm -pfb /home/julia.arendt/IC_JA/gatk-4.2.0.0/INPD12.pfb -list /home/julia.arendt/IC_JA/gatk-4.2.0.0/IDs_INPD12 -log sd22_affy.log -out sd22_affy.rawcnv
 
 ./filter_cnv.pl sd22_affy.rawcnv -qclogfile sd22_affy.log -qclrrsd 0.3 -qcpassout sd22_affy.qcpass -qcsumout sd22_affy.qcsum -qcnumcnv 100 -out sd22_affy.goodcnv
 
