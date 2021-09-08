@@ -62,8 +62,7 @@ perl /home/julia.arendt/IC_JA/PennCNV-1.0.5/detect_cnv.pl -test -hmm affygw6.hmm
 PennCNV - controle de qualidade (Malú)
 
 # 1. QC por amostra
-
-./filter_cnv.pl sd22_affy.rawcnv -qclogfile sd22_affy.log -qclrrsd 0.3 -qcpassout sd22_affy.qcpass -qcsumout sd22_affy.qcsum -qcnumcnv 100 -out sd22_affy.goodcnv
+./filter_cnv.pl ../gatk-4.2.0.0/sd22_affy.rawcnv -qclogfile ../gatk-4.2.0.0/sd22_affy.log -qclrrsd 0.3 -qcpassout sd22_affy.qcpass -qcsumout sd22_affy.qcsum -qcnumcnv 100 -out sd22_affy.goodcnv
 
 (wc) 814   5698 120141 ../gatk-4.2.0.0/sd22_affy.rawcnv
 (wc) 326  2282 48156 sd22_affy.goodcnv
@@ -74,20 +73,22 @@ eshg <- sd22_affy barplot(eshg$LRR_SD, ylim = c(0, 0.3), xlab = "Pacientes", yla
 # 2. Remover regiões ruins
 
 ## Centroméricas
-./scan_region.pl sd22_affy.goodcnv cen_region -minqueryfrac 0.5 > cnvcall.cen
+./scan_region.pl sd22_affy.goodcnv centromerescerto.txt -minqueryfrac 0.5 > cnvcall.cen
 fgrep -v -f cnvcall.cen sd22_affy.goodcnv > sd22_affy_cen.clean
 
 (wc) 322  2254 47557 sd22_affy_cen.clean
 
 ## Teloméricas:
-./scan_region.pl sd22_affy_cen.clean tel_region -minqueryfrac 0.5 > cnvcall.tel
+./scan_region.pl sd22_affy_cen.clean telomeres.txt -minqueryfrac 0.5 > cnvcall.tel
 fgrep -v -f cnvcall.tel sd22_affy_cen.clean > sd22_affy_cen_tel.clean
 
-(wc)  320  2240 47266 sd22_affy_cen_tel.clean
+(wc) 320  2240 47266 sd22_affy_cen_tel.clean
 
 ## Duplicações segmentais, exceto 22q11.2 
-./scan_region.pl sd22_affy_cen_tel.clean seg_dup_without22q112.txt -minqueryfrac 0.5 > cnvcall.segdup 
+./scan_region.pl sd22_affy_cen_tel.clean segdup_hg19certo.bed -minqueryfrac 0.5 > cnvcall.segdup
 fgrep -v -f cnvcall.segdup sd22_affy_cen_tel.clean > sd22_affy_cen_tel_segdup.clean
+
+(wc) 258  1806 37974 sd22_affy_cen_tel_segdup.clean
 
 ## Regiões de imunoglobulinas:
 ./scan_region.pl sd22_affy_cen_tel_segdup.clean immuno_region -minqueryfrac 0.5 > cnvcall.immuno 
