@@ -1,5 +1,3 @@
-
-
 # Os arquivos que você vai usar estão nessa pasta abaixo no Cerebro. São doze arquivos INPD_GenoBroad19_* . Cada um pesa 6.1Gb zipado. Já transferi o primeiro para a sua pasta
 
 /genetica_1/Genotipagem_INPD_Broad2019/PGC_NIMH_Salum_PTSD_GSA-MD_v1_3/RP-1194/processamento_inpd2019/proc_inicial_5548inds_dez19/
@@ -52,6 +50,8 @@ detect_cnv.pl -test -hmm /home/julia.arendt/IC_JA/PennCNV-1.0.5/affy/libgw6/affy
 
 ./filter_cnv.pl sd22_affy.rawcnv -qclogfile sd22_affy.log -qclrrsd 0.3 -qcpassout sd22_affy.qcpass -qcsumout sd22_affy.qcsum -qcnumcnv 100 -out sd22_affy.goodcnv
 
+
+
 PennCNV - controle de qualidade (Malú)
 
 # 1. QC por amostra
@@ -101,21 +101,21 @@ fgrep -v -f cnvcall.immuno sd22_affy_cen_tel_segdup.clean > sd22_affy_cen_tel_se
 # 3. Merge
 ./clean_cnv.pl -signalfile ashg.329 combineseg sd22_affy_cen_tel_segdup_immuno.clean > sd22_affy_cen_tel_segdup_immuno_merged.clean
 
-signalfile: a file that contains Chr and Position for
-SNPs/markers
+signalfile: a file that contains Chr and Position for SNPs/markers
 Observação: fraction 0.2 (default)
 
 # 4. Mínimo de sondas:
-Deleções: 20 sondas
-./filter_cnv.pl -numsnp 10 -type del sd22_affy_cen_tel_segdup_immuno_merged.clean -output sd22_affy_del.clean
 
-Duplicações: 20 sondas
+## Deleções (20 sondas):
+./filter_cnv.pl -numsnp 20 -type del sd22_affy_cen_tel_segdup_immuno_merged.clean -output sd22_affy_del.clean
+
+## Duplicações (20 sondas):
 ./filter_cnv.pl -numsnp 20 -type dup sd22_affy_cen_tel_segdup_immuno_merged.clean -output sd22_affy_dup.clean
 
 # 5. Juntar arquivos com deleções e duplicações:
 cat sd22_affy_del.clean sd22_affy_dup.clean > sd22_affy_del_dup.clean
 
-# 6.Ordenar pela primeira coluna
+# 6. Ordenar pela primeira coluna
 man sort 
 sort -rk 1 nomedoarquivo > nomedoarquivonovo_ordenado
 
