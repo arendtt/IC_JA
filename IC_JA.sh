@@ -104,16 +104,24 @@ fgrep -v -f cnvcall.immuno sd22_affy_cen_tel_segdup.clean > sd22_affy_cen_tel_se
 signalfile: a file that contains Chr and Position for SNPs/markers
 Observação: fraction 0.2 (default)
 
+### Não fiz
+
 # 4. Mínimo de sondas:
 
 ## Deleções (20 sondas):
 ./filter_cnv.pl -numsnp 20 -type del sd22_affy_cen_tel_segdup_immuno_merged.clean -output sd22_affy_del.clean
 
+(wc) 50  350 7307 sd22_affy_del.clean
+
 ## Duplicações (20 sondas):
 ./filter_cnv.pl -numsnp 20 -type dup sd22_affy_cen_tel_segdup_immuno_merged.clean -output sd22_affy_dup.clean
 
+(wc) 45  315 6684 sd22_affy_dup.clean
+
 # 5. Juntar arquivos com deleções e duplicações:
 cat sd22_affy_del.clean sd22_affy_dup.clean > sd22_affy_del_dup.clean
+
+(wc) 95   665 13991 sd22_affy_del_dup.clean
 
 # 6. Ordenar pela primeira coluna
 man sort 
