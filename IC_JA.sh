@@ -18,7 +18,9 @@ cd gatk-4.2.0.0/
 ./gatk 
 
 ### Se funcionar o programa vai rodar com as opcoes  
-
+Pegar dados do cerebro
+scp quem praonde
+scp 
 # indexar o vcf. Imagina que esse arquivo é gigantesco, "indexar" em genética significa que o programinha vai criar um index para facilitar encontrar as infos mais rapidamente no arquivo. Tipo um livro
 
 ./gatk IndexFeatureFile -I /home/julia.arendt/IC_JA/INPD_GenoBroad19_12.vcf.gz 
