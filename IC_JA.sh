@@ -20,7 +20,8 @@ cd gatk-4.2.0.0/
 ### Se funcionar o programa vai rodar com as opcoes  
 Pegar dados do cerebro
 scp quem praonde
-scp 
+scp escience@172.23.16.216:/genetica_1/Genotipagem_INPD_Broad2019/PGC_NIMH_Salum_PTSD_GSA-MD_v1_3/RP-1194/processamento_inpd2019/proc_inicial_5548inds_dez19/INPD_GenoBroad19_11.vcf.gz ./IC_JA/
+senha:
 # indexar o vcf. Imagina que esse arquivo é gigantesco, "indexar" em genética significa que o programinha vai criar um index para facilitar encontrar as infos mais rapidamente no arquivo. Tipo um livro
 
 ./gatk IndexFeatureFile -I /home/julia.arendt/IC_JA/INPD_GenoBroad19_12.vcf.gz 
