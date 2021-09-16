@@ -11,33 +11,32 @@
 # Entrar na pasta deste novo projeto
 
 # Fazer download e dezipar arquivos do gatk
-
 wget https://github.com/broadinstitute/gatk/releases/download/4.2.0.0/gatk-4.2.0.0.zip
 unzip gatk-4.2.0.0.zip
 cd gatk-4.2.0.0/
 ./gatk 
 
 ### Se funcionar o programa vai rodar com as opcoes  
-Pegar dados do cerebro
-scp quem praonde
-scp escience@172.23.16.216:/genetica_1/Genotipagem_INPD_Broad2019/PGC_NIMH_Salum_PTSD_GSA-MD_v1_3/RP-1194/processamento_inpd2019/proc_inicial_5548inds_dez19/INPD_GenoBroad19_11.vcf.gz ./IC_JA/
-senha:
-# indexar o vcf. Imagina que esse arquivo é gigantesco, "indexar" em genética significa que o programinha vai criar um index para facilitar encontrar as infos mais rapidamente no arquivo. Tipo um livro
 
+# Pegar dados do cerebro
+scp escience@172.23.16.216:/genetica_1/Genotipagem_INPD_Broad2019/PGC_NIMH_Salum_PTSD_GSA-MD_v1_3/RP-1194/processamento_inpd2019/proc_inicial_5548inds_dez19/INPD_GenoBroad19_11.vcf.gz ./IC_JA/
+senha: escience
+
+### (scp quem praonde)
+
+# indexar o vcf. Imagina que esse arquivo é gigantesco, "indexar" em genética significa que o programinha vai criar um index para facilitar encontrar as infos mais rapidamente no arquivo. Tipo um livro
 ./gatk IndexFeatureFile -I /home/julia.arendt/IC_JA/INPD_GenoBroad19_12.vcf.gz 
 
 ### cuidado com os caminhos  
 
-# Separa as informações que são importantes para extrair o dado de CNV. Você pode ( e deve) estudar o que signifca cada uma dessas colunas que eu selecionei. Principalmente o BAF e LRR.
-
+# Separar as informações que são importantes para extrair o dado de CNV. Você pode ( e deve) estudar o que signifca cada uma dessas colunas que eu selecionei. Principalmente o BAF e LRR.
 ./gatk VariantsToTable -V /home/julia.arendt/IC_JA/INPD_GenoBroad19_12.vcf.gz -F ID -F CHROM -F POS -GF BAF -GF LRR -O INPD_CNVs_12.vcf  
 
 # trocando cabeçalhos (isso pode ser feito de uma forma mais bonita)
-
 sed 's/BAF/B Allele Freq/g' INPD_CNVs_12.vcf > INPD_CNVs_12.baf
 sed 's/LRR/Log R Ratio/g' INPD_CNVs_12.baf > INPD_CNVs_12.baf_lrr
 
-# Semelhante ao script da Malu daqui pra baixo. Ver e inserir as hashtags dela aqui
+### Semelhante ao script da Malu daqui pra baixo. Ver e inserir as hashtags dela aqui
 
 perl ~/PennCNV-1.0.5/compile_pfb.pl
 perl ~/PennCNV-1.0.5/kcolumn.pl INPD_CNVs_12.baf_lrr split 2 -tab -head 3 -name -out INPD_ref # parar aqui para apróxima semana
@@ -128,7 +127,7 @@ cat sd22_affy_del.clean sd22_affy_dup.clean > sd22_affy_del_dup.clean
 
 # 6. Ordenar pela primeira coluna
 man sort 
-sort -rk 1 nomedoarquivo > nomedoarquivonovo_ordenado
+sort -rk 1 sd22_affy_del_dup.clean > deldup.ordenado
 
 
 
