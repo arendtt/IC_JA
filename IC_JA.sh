@@ -40,7 +40,10 @@ sed 's/LRR/Log R Ratio/g' INPD_CNVs_12.baf > INPD_CNVs_12.baf_lrr
 ### Semelhante ao script da Malu daqui pra baixo. Ver e inserir as hashtags dela aqui
 
 perl ~/PennCNV-1.0.5/compile_pfb.pl
-perl ~/PennCNV-1.0.5/kcolumn.pl INPD_CNVs_12.baf_lrr split 2 -tab -head 3 -name -out INPD_ref # parar aqui para apróxima semana
+
+### Só da primeira vez
+
+perl ~/IC_JA/PennCNV-1.0.5/kcolumn.pl INPD_CNVs_12.baf_lrr split 2 -tab -head 3 -name -out INPD_ref 
 ls INPD_ref* > IDs_INPD12
 sed 's/INPD_ref.//g' IDs_INPD12 > lista_files_INPD12
 perl /home/julia.arendt/IC_JA/PennCNV-1.0.5/compile_pfb.pl -list IDs_INPD12 -output INPD12.pfb
