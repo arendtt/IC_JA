@@ -26,7 +26,7 @@ senha: escience
 
 # indexar o vcf. Imagina que esse arquivo é gigantesco, "indexar" em genética significa que o programinha vai criar um index para facilitar encontrar as infos mais rapidamente no arquivo. Tipo um livro
 ./gatk IndexFeatureFile -I /home/julia.arendt/IC_JA/INPD_GenoBroad19_12.vcf.gz 
-bcftools index INPD_GenoBroad19_12.vcf.gz
+tabix -p vcf INPD_GenoBroad19_11.vcf.gz
 
 ### cuidado com os caminhos  
 
