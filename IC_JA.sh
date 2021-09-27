@@ -31,9 +31,7 @@ tabix -p vcf INPD_GenoBroad19_11.vcf.gz
 ### cuidado com os caminhos  
 
 # Separar as informações que são importantes para extrair o dado de CNV. Você pode ( e deve) estudar o que signifca cada uma dessas colunas que eu selecionei. Principalmente o BAF e LRR.
-./gatk VariantsToTable -V /home/julia.arendt/IC_JA/INPD_GenoBroad19_12.vcf.gz -F ID -F CHROM -F POS -GF BAF -GF LRR -O INPD_CNVs_12.vcf  
-
-### Mais para frente, foi necessário trocar o cabeçalho: ID (-> Name); CHROM (-> Chr); POS (-> Position). Tentar colocar da maneira certa já nesse comando. 
+./gatk VariantsToTable -V /home/julia.arendt/IC_JA/INPD_GenoBroad19_11.vcf.gz -F Name -F Chr -F Position -GF BAF -GF LRR -O INPD_CNVs_11.vcf
 
 # trocando cabeçalhos (isso pode ser feito de uma forma mais bonita)
 sed 's/BAF/B Allele Freq/g' INPD_CNVs_12.vcf > INPD_CNVs_12.baf
