@@ -4,7 +4,7 @@
 
 ### IDs estao trocados como enviamos para o Broad. Precisa atuazliar IDs
 
-# instalar o gatk 
+# Instalar o gatk 
 
 # Criar uma pasta do projeto no seu home
 
@@ -24,33 +24,43 @@ senha: escience
 
 ### (scp quem praonde)
 
-# indexar o vcf. Imagina que esse arquivo é gigantesco, "indexar" em genética significa que o programinha vai criar um index para facilitar encontrar as infos mais rapidamente no arquivo. Tipo um livro
-./gatk IndexFeatureFile -I /home/julia.arendt/IC_JA/INPD_GenoBroad19_12.vcf.gz 
-tabix -p vcf INPD_GenoBroad19_11.vcf.gz
+# Indexar o vcf. Imagina que esse arquivo é gigantesco, "indexar" em genética significa que o programinha vai criar um index para facilitar encontrar as infos mais rapidamente no arquivo. Tipo um livro
+for i in {11..11}; do ./gatk IndexFeatureFile -I /home/julia.arendt/IC_JA/INPD_GenoBroad19_${i}.vcf.gz 
+for i in {11..11}; do tabix -p vcf INPD_GenoBroad19_${i}.vcf.gz; done
+ 
+### Cuidado com os caminhos  
 
-### cuidado com os caminhos  
-
-# Separar as informações que são importantes para extrair o dado de CNV. Você pode ( e deve) estudar o que signifca cada uma dessas colunas que eu selecionei. Principalmente o BAF e LRR.
-./gatk VariantsToTable -V /home/julia.arendt/IC_JA/INPD_GenoBroad19_11.vcf.gz -F Name -F Chr -F Position -GF BAF -GF LRR -O INPD_CNVs_11.vcf
+# Separar as informações que são importantes para extrair o dado de CNV. 
+for i in {11..11}; do ./gatk VariantsToTable -V /home/julia.arendt/IC_JA/INPD_GenoBroad19_${i}.vcf.gz -F ID -F CHROM -F POS -GF BAF -GF LRR -O INPD_CNVs_${i}.vcf; done
 
 # trocando cabeçalhos (isso pode ser feito de uma forma mais bonita)
-sed 's/BAF/B Allele Freq/g' INPD_CNVs_12.vcf > INPD_CNVs_12.baf
-sed 's/LRR/Log R Ratio/g' INPD_CNVs_12.baf > INPD_CNVs_12.baf_lrr
+for i in {11..11}; do sed 's/BAF/B Allele Freq/g' INPD_CNVs_${i}.vcf > INPD_CNVs_${i}.baf ; done
+for i in {11..11}; do sed 's/LRR/Log R Ratio/g' INPD_CNVs_${i}.baf > INPD_CNVs_${i}.baf_lrr ; done
 
-### Semelhante ao script da Malu daqui pra baixo. Ver e inserir as hashtags dela aqui
+## Semelhante ao script da Malu daqui pra baixo. Ver e inserir as hashtags dela aqui
 
-perl ~/PennCNV-1.0.5/compile_pfb.pl
+perl ~/PennCNV-1.0.5/compile_pfb.pl 
 
 ### Só da primeira vez
 
-perl ~/IC_JA/PennCNV-1.0.5/kcolumn.pl INPD_CNVs_12.baf_lrr split 2 -tab -head 3 -name -out INPD_ref 
-ls INPD_ref* > IDs_INPD12
-sed 's/INPD_ref.//g' IDs_INPD12 > lista_files_INPD12
-perl /home/julia.arendt/IC_JA/PennCNV-1.0.5/compile_pfb.pl -list IDs_INPD12 -output INPD12.pfb
+for i in {11..11}; do perl ~/IC_JA/PennCNV-1.0.5/kcolumn.pl INPD_CNVs_${i}.baf_lrr split 2 -tab -head 3 -name -out INPD_${i}_ref ; done
+
+# Mudar cabeçalhos dos *_ref* ## Perguntar pro Marquinhos (?)
+
+# Criar pfb unico
+for i in {11..11}; do ls INPD_${i}_ref* > IDs_INPD_${i} ; done
+for i in {11..11}; do head -n 250 IDs_INPD_${i} > IDs_ParaPFB ; done 
+
+### Checar um dia se os primeiros 250 não são aparentados. Ver no espelho do Broad.
+
+for i in {11..11}; do sed 's/INPD_${i}_ref.//g' IDs_INPD_${i} > lista_files_INPD_${i} ; done
+for i in {11..11}; do perl /home/julia.arendt/IC_JA/PennCNV-1.0.5/compile_pfb.pl -list IDs_ParaPFB -output INPD.pfb ; done
 
 # Daqui pra baixo você vai preciar mudar os radicais dos arquivos e com os dados da illumina
+# Aqui a gente precisava mudar o cabeçalho de todos os arquivos (500 ) mas achamos mais facil mudar a chamada no script, ao inves de procurar por Name, ele procura por ID.
+# sed 's/Name/ID/g; s/Chr/CHROM/g; s/Position/POS/g' detect_cnv.pl > detect_cnv_header.pl
 
-detect_cnv.pl -test -hmm /home/julia.arendt/IC_JA/PennCNV-1.0.5/affy/libgw6/affygw6.hmm -pfb /home/julia.arendt/IC_JA/gatk-4.2.0.0/INPD12.pfb -list /home/julia.arendt/IC_JA/gatk-4.2.0.0/IDs_INPD12 -log sd22_affy.log -out sd22_affy.rawcnv
+for i in {11..11}; do detect_cnv_header.pl -test -hmm /home/julia.arendt/IC_JA/PennCNV-1.0.5/affy/libgw6/affygw6.hmm -pfb /home/julia.arendt/IC_JA/gatk-4.2.0.0/INPD.pfb -list /home/julia.arendt/IC_JA/gatk-4.2.0.0/IDs_INPD12 -log sd22_affy.log -out sd22_affy.rawcnv
 
 ### Dentro da pasta gatk
 
