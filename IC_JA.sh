@@ -49,12 +49,20 @@ for i in {11..11}; do perl ~/IC_JA/PennCNV-1.0.5/kcolumn.pl INPD_CNVs_${i}.baf_l
 
 # Criar pfb unico
 for i in {11..11}; do ls INPD_${i}_ref* > IDs_INPD_${i} ; done
-for i in {11..11}; do head -n 250 IDs_INPD_${i} > IDs_ParaPFB ; done 
+#for i in {11..11}; do head -n 250 IDs_INPD_${i} > IDs_ParaPFB ; done 
 
 ### Checar um dia se os primeiros 250 não são aparentados. Ver no espelho do Broad.
 
 for i in {11..11}; do sed 's/INPD_${i}_ref.//g' IDs_INPD_${i} > lista_files_INPD_${i} ; done
-for i in {11..11}; do perl /home/julia.arendt/IC_JA/PennCNV-1.0.5/compile_pfb.pl -list IDs_ParaPFB -output INPD.pfb ; done
+
+# mudar cabecalho só do primeiro arquivo, de ID para Name, de POS para Position e de CHROM para Chr
+# Para sair do vi salvando: ESC ":x"
+# Para sair do vi sem salvar: ESC ":q!"
+
+#vi INPD_11_ref.201904760146_R07C01
+#for i in {11..11}; do perl /home/julia.arendt/IC_JA/PennCNV-1.0.5/compile_pfb.pl -list IDs_ParaPFB -output INPD.pfb ; done
+# reverter cabecalho para o original
+#vi INPD_11_ref.201904760146_R07C01
 
 # Daqui pra baixo você vai preciar mudar os radicais dos arquivos e com os dados da illumina
 # Aqui a gente precisava mudar o cabeçalho de todos os arquivos (500 ) mas achamos mais facil mudar a chamada no script, ao inves de procurar por Name, ele procura por ID.
