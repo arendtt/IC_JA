@@ -90,8 +90,11 @@ PennCNV - controle de qualidade (Malú)
 (wc) 6683   46781 1011934 INPD11.goodcnv
 
 ## No R, usando o arquivo sd22_affy.qcsum. Visualização da distribuição de CNVs por pacientes (não fiz!)
-eshg <- sd22_affy barplot(eshg$LRR_SD, ylim = c(0, 0.3), xlab = "Pacientes", ylab = "LRR_SD", main = "Sample QC") barplot(eshg$NumCNV, ylim = c(0,30), main = "CNVs por amostra", xlab = "Pacientes", ylab = "Número de CNVs" )
-
+eshg <- read.table("~/caminho/arquivoquevcquerchamar.goodcnv", h=T) 
+head(eshg)
+barplot(eshg$LRR_SD, ylim = c(0, 0.3), xlab = "Pacientes", ylab = "LRR_SD", main = "Sample QC") 
+barplot(eshg$NumCNV, ylim = c(0,30), main = "CNVs por amostra", xlab = "Pacientes", ylab = "Número de CNVs" )
+0
 # 2. Remover regiões ruins
 
 ## Centroméricas
