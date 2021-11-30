@@ -2,6 +2,8 @@
 
 /genetica_1/Genotipagem_INPD_Broad2019/PGC_NIMH_Salum_PTSD_GSA-MD_v1_3/RP-1194/processamento_inpd2019/proc_inicial_5548inds_dez19/
 
+scp i123@172.23.16.216:/media/i123/genetica_1/Genotipagem_INPD_Broad2019/PGC_NIMH_Salum_PTSD_GSA-MD_v1_3/RP-1194/processamento_inpd2019/proc_inicial_5548inds_dez19/INPD_GenoBroad19_10.vcf.gz ./julia.arendt/IC_JA/
+
 ### IDs estao trocados como enviamos para o Broad. Precisa atuazliar IDs
 
 # Instalar o gatk 
