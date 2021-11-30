@@ -42,7 +42,7 @@ for i in {11..11}; do sed 's/LRR/Log R Ratio/g' INPD_CNVs_${i}.baf > INPD_CNVs_$
 
 ## Semelhante ao script da Malu daqui pra baixo. Ver e inserir as hashtags dela aqui
 
-perl ~/PennCNV-1.0.5/compile_pfb.pl 
+## perl ~/PennCNV-1.0.5/compile_pfb.pl 
 
 ### Só da primeira vez
 
@@ -51,8 +51,8 @@ for i in {11..11}; do perl ~/IC_JA/PennCNV-1.0.5/kcolumn.pl INPD_CNVs_${i}.baf_l
 # Mudar cabeçalhos dos *_ref* ## Perguntar pro Marquinhos (?)
 
 # Criar pfb unico
-for i in {11..11}; do ls INPD_${i}_ref* > IDs_INPD_${i} ; done
-#for i in {11..11}; do head -n 250 IDs_INPD_${i} > IDs_ParaPFB ; done 
+## for i in {11..11}; do ls INPD_${i}_ref* > IDs_INPD_${i} ; done
+## for i in {11..11}; do head -n 250 IDs_INPD_${i} > IDs_ParaPFB ; done 
 
 ### Checar um dia se os primeiros 250 não são aparentados. Ver no espelho do Broad.
 
