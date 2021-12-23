@@ -1,22 +1,6 @@
-# Os arquivos que você vai usar estão nessa pasta abaixo no Cerebro. São doze arquivos INPD_GenoBroad19_* . Cada um pesa 6.1Gb zipado. Já transferi o primeiro para a sua pasta
-
 /genetica_1/Genotipagem_INPD_Broad2019/PGC_NIMH_Salum_PTSD_GSA-MD_v1_3/RP-1194/processamento_inpd2019/proc_inicial_5548inds_dez19/
 
 ### IDs estao trocados como enviamos para o Broad. Precisa atuazliar IDs
-
-# Instalar o gatk 
-
-# Criar uma pasta do projeto no seu home
-
-# Entrar na pasta deste novo projeto
-
-# Fazer download e dezipar arquivos do gatk
-wget https://github.com/broadinstitute/gatk/releases/download/4.2.0.0/gatk-4.2.0.0.zip
-unzip gatk-4.2.0.0.zip
-cd gatk-4.2.0.0/
-./gatk 
-
-### Se funcionar o programa vai rodar com as opcoes  
 
 # Pegar dados do cerebro
 scp escience@172.23.16.216:/genetica_1/Genotipagem_INPD_Broad2019/PGC_NIMH_Salum_PTSD_GSA-MD_v1_3/RP-1194/processamento_inpd2019/proc_inicial_5548inds_dez19/INPD_GenoBroad19_11.vcf.gz ./IC_JA/
