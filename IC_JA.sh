@@ -40,7 +40,6 @@ for i in {11..11}; do ./gatk VariantsToTable -V /home/julia.arendt/IC_JA/INPD_Ge
 for i in {11..11}; do sed 's/BAF/B Allele Freq/g' INPD_CNVs_${i}.vcf > INPD_CNVs_${i}.baf ; done
 for i in {11..11}; do sed 's/LRR/Log R Ratio/g' INPD_CNVs_${i}.baf > INPD_CNVs_${i}.baf_lrr ; done
 
-## Semelhante ao script da Malu daqui pra baixo. Ver e inserir as hashtags dela aqui
 
 ## perl ~/PennCNV-1.0.5/compile_pfb.pl 
 
@@ -48,13 +47,9 @@ for i in {11..11}; do sed 's/LRR/Log R Ratio/g' INPD_CNVs_${i}.baf > INPD_CNVs_$
 
 for i in {11..11}; do perl ~/IC_JA/PennCNV-1.0.5/kcolumn.pl INPD_CNVs_${i}.baf_lrr split 2 -tab -head 3 -name -out INPD_${i}_ref ; done
 
+for i in {11..11}; do ls INPD_${i}_ref* > IDs_INPD_${i} ; done
+
 # Mudar cabeçalhos dos *_ref* ## Perguntar pro Marquinhos (?)
-
-# Criar pfb unico
-## for i in {11..11}; do ls INPD_${i}_ref* > IDs_INPD_${i} ; done
-## for i in {11..11}; do head -n 250 IDs_INPD_${i} > IDs_ParaPFB ; done 
-
-### Checar um dia se os primeiros 250 não são aparentados. Ver no espelho do Broad.
 
 for i in {11..11}; do sed 's/INPD_${i}_ref.//g' IDs_INPD_${i} > lista_files_INPD_${i} ; done
 
@@ -71,7 +66,7 @@ for i in {11..11}; do sed 's/INPD_${i}_ref.//g' IDs_INPD_${i} > lista_files_INPD
 # Aqui a gente precisava mudar o cabeçalho de todos os arquivos (500 ) mas achamos mais facil mudar a chamada no script, ao inves de procurar por Name, ele procura por ID.
 # sed 's/Name/ID/g; s/Chr/CHROM/g; s/Position/POS/g' detect_cnv.pl > detect_cnv_header.pl
 
-for i in {11..11}; do detect_cnv_header.pl -test -hmm /home/julia.arendt/IC_JA/PennCNV-1.0.5/lib/hhall.hmm -pfb /home/julia.arendt/IC_JA/gatk-4.2.0.0/INPD.pfb -list /home/julia.arendt/IC_JA/gatk-4.2.0.0/IDs_INPD11 -log INPD11.log -out INPD11.rawcnv; done
+for i in {11..11}; do detect_cnv_header.pl -test -hmm /home/julia.arendt/IC_JA/PennCNV-1.0.5/lib/hhall.hmm -pfb /home/julia.arendt/IC_JA/gatk-4.2.0.0/INPD.pfb -list /home/julia.arendt/IC_JA/gatk-4.2.0.0/IDs_INPD_11 -log INPD11.log -out INPD11.rawcnv; done
 
 ### Mudar sd22 para INPD
 
