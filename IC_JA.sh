@@ -66,13 +66,13 @@ for i in {11..11}; do sed 's/INPD_${i}_ref.//g' IDs_INPD_${i} > lista_files_INPD
 # Aqui a gente precisava mudar o cabeçalho de todos os arquivos (500 ) mas achamos mais facil mudar a chamada no script, ao inves de procurar por Name, ele procura por ID.
 # sed 's/Name/ID/g; s/Chr/CHROM/g; s/Position/POS/g' detect_cnv.pl > detect_cnv_header.pl
 
-for i in {11..11}; do detect_cnv_header.pl -test -hmm /home/julia.arendt/IC_JA/PennCNV-1.0.5/lib/hhall.hmm -pfb /home/julia.arendt/IC_JA/gatk-4.2.0.0/INPD.pfb -list /home/julia.arendt/IC_JA/gatk-4.2.0.0/IDs_INPD_11 -log INPD11.log -out INPD11.rawcnv; done
+## Na pasta gatk 
 
-### Mudar sd22 para INPD
+for i in {10..10}; do detect_cnv_header.pl -test -hmm /home/julia.arendt/IC_JA/PennCNV-1.0.5/lib/hhall.hmm -pfb /home/julia.arendt/IC_JA/gatk-4.2.0.0/INPD.pfb -list /home/julia.arendt/IC_JA/gatk-4.2.0.0/IDs_INPD_10 -log INPD10.log -out INPD10.rawcnv; done
 
-### Dentro da pasta gatk
+### Mudar para PennCNV
 
-./filter_cnv.pl sd22_affy.rawcnv -qclogfile sd22_affy.log -qclrrsd 0.3 -qcpassout sd22_affy.qcpass -qcsumout sd22_affy.qcsum -qcnumcnv 100 -out sd22_affy.goodcnv
+./filter_cnv.pl ~/IC_JA/gatk-4.2.0.0/INPD10.rawcnv -qclogfile ~/IC_JA/gatk-4.2.0.0/INPD10.log -qclrrsd 0.3 -qcpassout INPD10.qcpass -qcsumout INPD10.qcsum -qcnumcnv 100 -out INPD10.goodcnv
 
 
 
