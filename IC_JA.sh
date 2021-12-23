@@ -61,18 +61,22 @@ PennCNV - controle de qualidade (Malú)
 # 1. QC por amostra
 ./filter_cnv.pl ~/IC_JA/gatk-4.2.0.0/INPD10.rawcnv -qclogfile ~/IC_JA/gatk-4.2.0.0/INPD10.log -qclrrsd 0.3 -qcpassout INPD10.qcpass -qcsumout INPD10.qcsum -qcnumcnv 100 -out INPD10.goodcnv
 
-(wc) 814   5698 120141 ../gatk-4.2.0.0/sd22_affy.rawcnv
+(wc) 814   5698 120141 ../gatk-4.2.0.0/sd22_affy.rawcnv (INPD12)
 (wc) 326  2282 48156 sd22_affy.goodcnv
 
 (wc)  10459   73213 1578334 /home/julia.arendt/IC_JA/gatk-4.2.0.0/INPD11.rawcnv
 (wc) 6683   46781 1011934 INPD11.goodcnv
 
-## No R, usando o arquivo sd22_affy.qcsum. Visualização da distribuição de CNVs por pacientes (não fiz!)
+(wc) 6380  44660 965595 INPD10.rawcnv
+(wc)   4701  32907 711899 INPD10.goodcnv
+
+## No R, usando o arquivo .qcsum. Visualização da distribuição de CNVs por pacientes (não fiz!)
 eshg <- read.table("~/caminho/arquivoquevcquerchamar.goodcnv", h=T) 
 head(eshg)
 barplot(eshg$LRR_SD, ylim = c(0, 0.3), xlab = "Pacientes", ylab = "LRR_SD", main = "Sample QC") 
 barplot(eshg$NumCNV, ylim = c(0,30), main = "CNVs por amostra", xlab = "Pacientes", ylab = "Número de CNVs" )
-0
+
+
 # 2. Remover regiões ruins
 
 ## Centroméricas
@@ -86,6 +90,8 @@ fgrep -v -f cnvcall.cen sd22_affy.goodcnv > sd22_affy_cen.clean
 
 (wc) 6638   46466 1004985 INPD11_cen.clean
 
+(wc)  4698  32886 711435 INPD10_cen.clean
+
 ## Teloméricas:
 ### Arquivo telomeres.txt feito com 10000bp de diferença - Genome Browser
 
@@ -95,6 +101,8 @@ fgrep -v -f cnvcall.tel sd22_affy_cen.clean > sd22_affy_cen_tel.clean
 (wc) 320  2240 47266 sd22_affy_cen_tel.clean
 
 (wc) 6638   46466 1004985 INPD11_cen_tel.clean
+
+(wc)  4697  32879 711292 INPD10_cen_tel.clean
 
 ## Duplicações segmentais, exceto 22q11.2: 
 ### Arquivo segdup_hg19certo.bed feito em https://genome.ucsc.edu/cgi-bin/hgTables (group: Repeats; tracks: Segmental Dups; table: genomicSuperDups)
@@ -107,6 +115,8 @@ fgrep -v -f cnvcall.segdup sd22_affy_cen_tel.clean > sd22_affy_cen_tel_segdup.cl
 (wc) 258  1806 37974 sd22_affy_cen_tel_segdup.clean
 
 (wc)  5372  37604 811895 INPD11_cen_tel_segdup.clean
+
+(wc) 4135  28945 625429 INPD10_cen_tel_segdup.clean
 
 ## Regiões de imunoglobulinas:
 ### Não achei arquivo para hg19
@@ -125,18 +135,22 @@ Observação: fraction 0.2 (default)
 # 4. Mínimo de sondas:
 
 ## Deleções (20 sondas):
-./filter_cnv.pl -numsnp 20 -length 1k -type del sd22_affy_cen_tel_segdup_immuno_merged.clean -output sd22_affy_del.clean
+./filter_cnv.pl -numsnp 10 -length 1k -type del sd22_affy_cen_tel_segdup_immuno_merged.clean -output sd22_affy_del.clean
 
 (wc) 50  350 7307 sd22_affy_del.clean
 
 (wc)  170  1190 25267 INPD11_del.clean
 
+(wc) 348  2436 52617 INPD10_del.clean
+
 ## Duplicações (20 sondas):
-./filter_cnv.pl -numsnp 20 -length 1k -type dup sd22_affy_cen_tel_segdup_immuno_merged.clean -output sd22_affy_dup.clean
+./filter_cnv.pl -numsnp 10 -length 1k -type dup sd22_affy_cen_tel_segdup_immuno_merged.clean -output sd22_affy_dup.clean
 
 (wc) 45  315 6684 sd22_affy_dup.clean
 
 (wc)  144  1008 21702 INPD11_dup.clean
+
+(wc)  222  1554 33718 INPD10_dup.clean
 
 # 5. Juntar arquivos com deleções e duplicações:
 cat sd22_affy_del.clean sd22_affy_dup.clean > sd22_affy_del_dup.clean
@@ -144,6 +158,8 @@ cat sd22_affy_del.clean sd22_affy_dup.clean > sd22_affy_del_dup.clean
 (wc) 95   665 13991 sd22_affy_del_dup.clean
 
 (wc)  314  2198 46969 INPD11_del_dup.clean
+
+(wc) 570  3990 86335 INPD10_del_dup.clean
 
 # 6. Ordenar pela primeira coluna
 man sort 
