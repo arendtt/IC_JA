@@ -54,16 +54,12 @@ for i in {11..11}; do sed 's/INPD_${i}_ref.//g' IDs_INPD_${i} > lista_files_INPD
 
 for i in {10..10}; do detect_cnv_header.pl -test -hmm /home/julia.arendt/IC_JA/PennCNV-1.0.5/lib/hhall.hmm -pfb /home/julia.arendt/IC_JA/gatk-4.2.0.0/INPD.pfb -list /home/julia.arendt/IC_JA/gatk-4.2.0.0/IDs_INPD_10 -log INPD10.log -out INPD10.rawcnv; done
 
-### Mudar para PennCNV
-
-./filter_cnv.pl ~/IC_JA/gatk-4.2.0.0/INPD10.rawcnv -qclogfile ~/IC_JA/gatk-4.2.0.0/INPD10.log -qclrrsd 0.3 -qcpassout INPD10.qcpass -qcsumout INPD10.qcsum -qcnumcnv 100 -out INPD10.goodcnv
-
 
 
 PennCNV - controle de qualidade (Malú)
 
 # 1. QC por amostra
-./filter_cnv.pl ../gatk-4.2.0.0/sd22_affy.rawcnv -qclogfile ../gatk-4.2.0.0/sd22_affy.log -qclrrsd 0.3 -qcpassout sd22_affy.qcpass -qcsumout sd22_affy.qcsum -qcnumcnv 100 -out sd22_affy.goodcnv
+./filter_cnv.pl ~/IC_JA/gatk-4.2.0.0/INPD10.rawcnv -qclogfile ~/IC_JA/gatk-4.2.0.0/INPD10.log -qclrrsd 0.3 -qcpassout INPD10.qcpass -qcsumout INPD10.qcsum -qcnumcnv 100 -out INPD10.goodcnv
 
 (wc) 814   5698 120141 ../gatk-4.2.0.0/sd22_affy.rawcnv
 (wc) 326  2282 48156 sd22_affy.goodcnv
