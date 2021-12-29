@@ -161,8 +161,7 @@ cat sd22_affy_del.clean sd22_affy_dup.clean > sd22_affy_del_dup.clean
 
 (wc) 570  3990 86335 INPD10_del_dup.clean
 
-# 6. Ordenar pela primeira coluna
-man sort 
+# 6. Ordenar pela primeira coluna 
 sort -rk 1 sd22_affy_del_dup.clean > deldup.ordenado
 
 
