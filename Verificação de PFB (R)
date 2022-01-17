@@ -1,0 +1,34 @@
+# Checar se no PFB tem indivíduos aparentados pelo R:
+
+## abrir tabela espelho
+espelho <- read.table("/Users/Júlia/Downloads/Espelho_INPD_todos_nov19.txt",header = F)
+
+## explorar tabela
+dim(espelho)
+
+## mudar cabeçalho
+colnames(espelho) <- c("1","ID","2","família")
+
+## abrir tabela PFB
+PFB <- read.table("~/Documentos/IDs_ParaPFB", header = F)
+
+## mudar cabeçalho
+colnames(PFB) <- c("ID")
+
+## padronizar formato de ID (retirar INPD_11_ref. do PFB)
+PFB$ID <- gsub("INPD_11_ref.","",PFB$ID)
+
+## baixar programa plyr
+install.packages("plyr")
+
+## abrir plyr 
+library(plyr)
+
+## juntar tabelas através de um comando do plyr: join_all 
+join <- join_all(dfs = list(PFB,espelho), by = "ID",type = "left")
+
+## criar uma nova coluna com os mesmos dados da coluna família, mas sem as primeiras letras (P, M, C)
+join$famID <- substr(join$família,2,6)
+
+## perguntar se algum dado na coluna famID está duplicado
+duplicated(join$famID)
