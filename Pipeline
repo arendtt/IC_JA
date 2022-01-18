@@ -71,6 +71,7 @@ PennCNV - controle de qualidade (Malú)
 (wc)   4701  32907 711899 INPD10.goodcnv
 
 (wc)  5738  40166 861043 INPD_9.rawcnv
+(wc)  4464  31248 669575 INPD_9.goodcnv
 
 ## No R, usando o arquivo .qcsum. Visualização da distribuição de CNVs por pacientes (não fiz!)
 eshg <- read.table("~/caminho/arquivoquevcquerchamar.goodcnv", h=T) 
@@ -94,6 +95,8 @@ fgrep -v -f cnvcall.cen sd22_affy.goodcnv > sd22_affy_cen.clean
 
 (wc)  4698  32886 711435 INPD10_cen.clean
 
+(wc) 4450  31150 667422 INPD_9_cen.clean
+
 ## Teloméricas:
 ### Arquivo telomeres.txt feito com 10000bp de diferença - Genome Browser
 
@@ -105,6 +108,8 @@ fgrep -v -f cnvcall.tel sd22_affy_cen.clean > sd22_affy_cen_tel.clean
 (wc) 6638   46466 1004985 INPD11_cen_tel.clean
 
 (wc)  4697  32879 711292 INPD10_cen_tel.clean
+
+(wc)  4449  31143 667275 INPD_9_cen_tel.clean
 
 ## Duplicações segmentais, exceto 22q11.2: 
 ### Arquivo segdup_hg19certo.bed feito em https://genome.ucsc.edu/cgi-bin/hgTables (group: Repeats; tracks: Segmental Dups; table: genomicSuperDups)
@@ -119,6 +124,8 @@ fgrep -v -f cnvcall.segdup sd22_affy_cen_tel.clean > sd22_affy_cen_tel_segdup.cl
 (wc)  5372  37604 811895 INPD11_cen_tel_segdup.clean
 
 (wc) 4135  28945 625429 INPD10_cen_tel_segdup.clean
+
+(wc) 3885  27195 581947 INPD_9_cen_tel_segdup.clean
 
 ## Regiões de imunoglobulinas:
 ### Não achei arquivo para hg19
@@ -145,6 +152,8 @@ Observação: fraction 0.2 (default)
 
 (wc) 348  2436 52617 INPD10_del.clean
 
+(wc) 222  1554 33291 INPD_9_del.clean
+
 ## Duplicações (20 sondas):
 ./filter_cnv.pl -numsnp 10 -length 1k -type dup sd22_affy_cen_tel_segdup_immuno_merged.clean -output sd22_affy_dup.clean
 
@@ -154,6 +163,8 @@ Observação: fraction 0.2 (default)
 
 (wc)  222  1554 33718 INPD10_dup.clean
 
+(wc) 164  1148 24718 INPD_9_dup.clean
+
 # 5. Juntar arquivos com deleções e duplicações:
 cat sd22_affy_del.clean sd22_affy_dup.clean > sd22_affy_del_dup.clean
 
@@ -162,6 +173,8 @@ cat sd22_affy_del.clean sd22_affy_dup.clean > sd22_affy_del_dup.clean
 (wc)  314  2198 46969 INPD11_del_dup.clean
 
 (wc) 570  3990 86335 INPD10_del_dup.clean
+
+(wc)  386  2702 58009 INPD_9_del_dup.clean
 
 # 6. Ordenar pela primeira coluna 
 sort -rk 1 sd22_affy_del_dup.clean > deldup.ordenado
