@@ -70,6 +70,8 @@ PennCNV - controle de qualidade (Malú)
 (wc) 6380  44660 965595 INPD10.rawcnv
 (wc)   4701  32907 711899 INPD10.goodcnv
 
+(wc)  5738  40166 861043 INPD_9.rawcnv
+
 ## No R, usando o arquivo .qcsum. Visualização da distribuição de CNVs por pacientes (não fiz!)
 eshg <- read.table("~/caminho/arquivoquevcquerchamar.goodcnv", h=T) 
 head(eshg)
