@@ -30,8 +30,32 @@ join <- join_all(dfs = list(PFB,espelho), by = "ID",type = "left")
 ## criar uma nova coluna com os mesmos dados da coluna família, mas sem as primeiras letras (P, M, C)
 join$famID <- substr(join$família,2,6)
 
-## criar coluna de identificação familiar 
+## criar coluna de identificação familiar (trio)
 join$trio <- substr(join$família,1,1)
 
 ## perguntar se algum dado na coluna famID está duplicado
 duplicated(join$famID)
+
+
+# Como havia duplicação (6 pais-criança + 1 pai-mãe):
+
+## tabela a possui os elementos duplicados da coluna famID de join - 14 elementos
+a <- duplicated(join$famID)
+
+## criar uma tabela com os elementos de a - 7 elementos
+join2 <- join[a,]
+
+## criar uma tabela com as linhas de famID que estão dentro de join2 - 14 elementos
+join3 <- join[join$famID %in% join2$famID,]
+
+## criar uma tabela com os primeiros 6 indivíduos de join3, que são as crianças que queremos excluir
+b <- join3$família [1:6]  ### ou c <- join3[grepl("C",join3$trio),1]
+
+## criar uma tabela com tudo o que há em join exceto o que há em b - 244 indivíduos
+PFB2 <- as.data.frame(join[!join$ID %in% b,])
+PFB2 <- as.data.frame(PFB[!PFB$ID %in% b,])
+
+## salvar PFB2 no computador (/Teste)
+write.table(PFB2,"PFB_novo.txt",quote = F, row.names = F, col.names = F)
+
+## passar para a linha de comando com winscp
