@@ -42,7 +42,7 @@ for i in {11..11}; do sed 's/INPD_${i}_ref.//g' IDs_INPD_${i} > lista_files_INPD
 # Para sair do vi sem salvar: ESC ":q!"
 
 #vi INPD_11_ref.201904760146_R07C01
-#for i in {11..11}; do perl /home/julia.arendt/IC_JA/PennCNV-1.0.5/compile_pfb.pl -list IDs_ParaPFB -output INPD.pfb ; done
+#for i in {11..11}; do perl /home/julia.arendt/IC_JA/PennCNV-1.0.5/compile_pfb.pl -list PFB_novo.txt -output INPD.pfb ; done #PFB_novo.txt é o arquivo sem parentes, antes era IDs_ParaPFB
 # reverter cabecalho para o original
 #vi INPD_11_ref.201904760146_R07C01
 
