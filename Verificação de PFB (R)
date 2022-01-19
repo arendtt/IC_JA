@@ -30,5 +30,8 @@ join <- join_all(dfs = list(PFB,espelho), by = "ID",type = "left")
 ## criar uma nova coluna com os mesmos dados da coluna família, mas sem as primeiras letras (P, M, C)
 join$famID <- substr(join$família,2,6)
 
+## criar coluna de identificação familiar 
+join$trio <- substr(join$família,1,1)
+
 ## perguntar se algum dado na coluna famID está duplicado
 duplicated(join$famID)
