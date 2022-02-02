@@ -204,7 +204,7 @@ INPD9:
 (wc) 162  1134 24417 INPD_9_dup.clean
 
 # 4. Juntar arquivos com deleções e duplicações:
-for i in {1..12}; do cat INPD_${i}_del.clean INPD_${i}_dup.clean > INPD_${i}_del_dup.clean
+for i in {1..12}; do cat INPD_${i}_del.clean INPD_${i}_dup.clean > INPD_${i}_del_dup.clean ; done
 
 ## Resultados - PFB 250 indivíduos (12 aparentados):
 
