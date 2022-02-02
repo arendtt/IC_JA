@@ -29,6 +29,11 @@ INPD9:
 
 ## Resultados - PFB 244 indivíduos:
 
+INPD12: 
+(wc) 828   5796 122642 INPD_12.rawcnv
+(wc) 674  4718 99858 INPD_12.goodcnv
+
+
 INPD11:
 (wc) 10462   73234 1578783 INPD_11.rawcnv
 (wc) 6682   46774 1011786 INPD_11.goodcnv
@@ -45,8 +50,8 @@ INPD9:
 # 2. Remover regiões ruins
 
 # a) Centroméricas
-for i in {1..12}; do ./scan_region.pl INPD_${i}.goodcnv centromerescerto.txt -minqueryfrac 0.5 > cnvcall.cen ; done
-for i in {1..12}; do fgrep -v -f cnvcall.cen INPD_${i}.goodcnv > INPD_${i}_cen.clean ; done
+for i in {1..12}; do ./scan_region.pl INPD_${i}.goodcnv centromerescerto.txt -minqueryfrac 0.5 > INPD_${i}_cnvcall.cen ; done
+for i in {1..12}; do fgrep -v -f INPD_${i}_cnvcall.cen INPD_${i}.goodcnv > INPD_${i}_cen.clean ; done
 
 ## Resultados - PFB 250 indivíduos (12 aparentados):
 
@@ -54,7 +59,7 @@ INPD12:
 (wc) 322  2254 47557 sd22_affy_cen.clean
 
 INPD11:
-(wc) 6638   46466 1004985 INPD11_cen.clean
+(wc) 6638   46459 1004837 INPD_11_cen.clean
 
 INPD10:
 (wc)  4698  32886 711435 INPD10_cen.clean
@@ -65,6 +70,7 @@ INPD9:
 ## Resultados - PFB 244 indivíduos: 
 
 INPD12: 
+(wc)  668  4676 98951 INPD_12_cen.clean
 
 INPD11:
 (wc) 6637   46459 1004837 INPD_11_cen.clean
@@ -77,8 +83,8 @@ INPD9:
 
 
 # b) Teloméricas:
-for i in {1..12}; do ./scan_region.pl INPD_&{i}_cen.clean telomeres.txt -minqueryfrac 0.5 > cnvcall.tel ; done
-for i in {1..12}; do fgrep -v -f cnvcall.tel INPD_${i}_cen.clean > INPD_${i}_cen_tel.clean ; done
+for i in {1..12}; do ./scan_region.pl INPD_${i}_cen.clean telomeres.txt -minqueryfrac 0.5 > INPD_${i}_cnvcall.tel ; done
+for i in {1..12}; do fgrep -v -f INPD_${i}_cnvcall.tel INPD_${i}_cen.clean > INPD_${i}_cen_tel.clean ; done
 
 ## Resultados - PFB 250 indivíduos (12 aparentados):
 
@@ -97,6 +103,7 @@ INPD9:
 ## Resultados - PFB 244 indivíduos:
 
 INPD12: 
+(wc) 666  4662 98665 INPD_12_cen_tel.clean
 
 INPD11:
 (wc) 6633   46431 1004235 INPD_11_cen_tel.clean
@@ -109,8 +116,8 @@ INPD9:
 
 
 # c) Duplicações segmentais, exceto 22q11.2: 
-for i in {1..12}; do ./scan_region.pl INPD_${i}_cen_tel.clean segdup_hg19certo.bed -minqueryfrac 0.5 > cnvcall.segdup ; done
-for i in {1..12}; do fgrep -v -f cnvcall.segdup INPD_${i}_cen_tel.clean > INPD_${i}_cen_tel_segdup.clean ; done
+for i in {1..12}; do ./scan_region.pl INPD_${i}_cen_tel.clean segdup_hg19certo.bed -minqueryfrac 0.5 > INPD_${i}_cnvcall.segdup ; done
+for i in {1..12}; do fgrep -v -f INPD_${i}_cnvcall.segdup INPD_${i}_cen_tel.clean > INPD_${i}_cen_tel_segdup.clean ; done
 
 ## Resultados - PFB 250 indivíduos (12 aparentados):
 
@@ -129,6 +136,7 @@ INPD9:
 ## Resultados - PFB 244 indivíduos:
 
 INPD12: 
+(wc) 565  3955 83557 INPD_12_cen_tel_segdup.clean
 
 INPD11:
 (wc) 5368  37576 811294 INPD_11_cen_tel_segdup.clean
@@ -162,6 +170,7 @@ INPD9:
 ## Resultados - PFB 244 indivíduos:
 
 INPD12: 
+(wc) 81   567 11980 INPD_12_del.clean
 
 INPD11:
 (wc)  784   5488 118035 INPD_11_del.clean
@@ -193,6 +202,7 @@ INPD9:
 ## Resultados - PFB 244 indivíduos:
 
 INPD12: 
+(wc) 49  343 7263 INPD_12_dup.clean
 
 INPD11:
 (wc) 518  3626 78426 INPD_11_dup.clean
@@ -223,6 +233,7 @@ INPD9:
 ## Resultados - PFB 244 indivíduos:
 
 INPD12: 
+(wc) 130   910 19243 INPD_12_del_dup.clean
 
 INPD11:
 (wc) 1302   9114 196461 INPD_11_del_dup.clean
