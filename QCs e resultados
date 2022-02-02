@@ -29,6 +29,13 @@ INPD9:
 
 ## Resultados - PFB 244 indivíduos:
 
+INPD11:
+(wc) 10462   73234 1578783 INPD_11.rawcnv
+
+INPD10:
+(wc)  6381  44667 965740 INPD_10.rawcnv
+(wc)  4703  32921 712211 INPD_10.goodcnv
+
 INPD9:
 (wc)  5739  40173 861195 INPD_9.rawcnv
 (wc)  4446  31122 666883 INPD_9.goodcnv
@@ -61,6 +68,7 @@ INPD12:
 INPD11:
 
 INPD10:
+(wc) 4700  32900 711747 INPD_10_cen.clean
 
 INPD9:
 (wc)  4432  31024 664730 INPD_9_cen.clean
@@ -91,6 +99,7 @@ INPD12:
 INPD11:
 
 INPD10:
+(wc) 4699  32893 711604 INPD_10_cen_tel.clean
 
 INPD9:
 (wc) 4431  31017 664583 INPD_9_cen_tel.clean
@@ -121,6 +130,7 @@ INPD12:
 INPD11:
 
 INPD10:
+(wc) 4137  28959 625736 INPD_10_cen_tel_segdup.clean
 
 INPD9:
 (wc)  3867  27069 579255 INPD_9_cen_tel_segdup.clean
@@ -152,6 +162,7 @@ INPD12:
 INPD11:
 
 INPD10:
+(wc) 349  2443 52768 INPD_10_del.clean
 
 INPD9:
 (wc) 219  1533 32848 INPD_9_del.clean
@@ -181,6 +192,7 @@ INPD12:
 INPD11:
 
 INPD10:
+(wc) 222  1554 33718 INPD_10_dup.clean
 
 INPD9:
 (wc) 162  1134 24417 INPD_9_dup.clean
@@ -209,6 +221,7 @@ INPD12:
 INPD11:
 
 INPD10:
+(wc) 571  3997 86486 INPD_10_del_dup.clean
 
 INPD9:
 (wc) 381  2667 57265 INPD_9_del_dup.clean
