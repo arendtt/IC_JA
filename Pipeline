@@ -12,7 +12,7 @@ senha: 123456
 ### (scp quem praonde)
 
 # Indexar o vcf. Imagina que esse arquivo é gigantesco, "indexar" em genética significa que o programinha vai criar um index para facilitar encontrar as infos mais rapidamente no arquivo. Tipo um livro
-for i in {11..11}; do ./gatk IndexFeatureFile -I /home/julia.arendt/IC_JA/INPD_GenoBroad19_${i}.vcf.gz 
+for i in {11..11}; do ./gatk IndexFeatureFile -I /home/julia.arendt/IC_JA/INPD_GenoBroad19_${i}.vcf.gz ; done
 for i in {11..11}; do tabix -p vcf INPD_GenoBroad19_${i}.vcf.gz; done
  
 ### Cuidado com os caminhos  
