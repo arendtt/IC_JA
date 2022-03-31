@@ -12,30 +12,30 @@ senha: 123456
 ### (scp quem praonde)
 
 # Indexar o vcf. Imagina que esse arquivo é gigantesco, "indexar" em genética significa que o programinha vai criar um index para facilitar encontrar as infos mais rapidamente no arquivo. Tipo um livro
-for i in {11..11}; do ./gatk IndexFeatureFile -I /home/julia.arendt/IC_JA/INPD_GenoBroad19_${i}.vcf.gz ; done
-for i in {11..11}; do tabix -p vcf INPD_GenoBroad19_${i}.vcf.gz; done
+for i in {1..12}; do ./gatk IndexFeatureFile -I /home/julia.arendt/IC_JA/INPD_GenoBroad19_${i}.vcf.gz ; done
+for i in {1..12}; do tabix -p vcf INPD_GenoBroad19_${i}.vcf.gz; done
  
 ### Cuidado com os caminhos  
 
 # Separar as informações que são importantes para extrair o dado de CNV. 
-for i in {11..11}; do ./gatk VariantsToTable -V /home/julia.arendt/IC_JA/INPD_GenoBroad19_${i}.vcf.gz -F ID -F CHROM -F POS -GF BAF -GF LRR -O INPD_CNVs_${i}.vcf; done
+for i in {1..12}; do ./gatk VariantsToTable -V /home/julia.arendt/IC_JA/INPD_GenoBroad19_${i}.vcf.gz -F ID -F CHROM -F POS -GF BAF -GF LRR --show-filtered -O INPD_CNVs_${i}.vcf; done
 
 # trocando cabeçalhos (isso pode ser feito de uma forma mais bonita)
-for i in {11..11}; do sed 's/BAF/B Allele Freq/g' INPD_CNVs_${i}.vcf > INPD_CNVs_${i}.baf ; done
-for i in {11..11}; do sed 's/LRR/Log R Ratio/g' INPD_CNVs_${i}.baf > INPD_CNVs_${i}.baf_lrr ; done
+for i in {1..12}; do sed 's/BAF/B Allele Freq/g' INPD_CNVs_${i}.vcf > INPD_CNVs_${i}.baf ; done
+for i in {1..12}; do sed 's/LRR/Log R Ratio/g' INPD_CNVs_${i}.baf > INPD_CNVs_${i}.baf_lrr ; done
 
 
 ## perl ~/PennCNV-1.0.5/compile_pfb.pl 
 
 ### Só da primeira vez
 
-for i in {11..11}; do perl ~/IC_JA/PennCNV-1.0.5/kcolumn.pl INPD_CNVs_${i}.baf_lrr split 2 -tab -head 3 -name -out INPD_${i}_ref ; done
+for i in {1..12}; do perl ~/IC_JA/PennCNV-1.0.5/kcolumn.pl INPD_CNVs_${i}.baf_lrr split 2 -tab -head 3 -name -out INPD_${i}_ref ; done
 
-for i in {11..11}; do ls INPD_${i}_ref* > IDs_INPD_${i} ; done
+for i in {1..12}; do ls INPD_${i}_ref* > IDs_INPD_${i} ; done
 
 # Mudar cabeçalhos dos *_ref* ## Perguntar pro Marquinhos (?)
 
-for i in {11..11}; do sed 's/INPD_${i}_ref.//g' IDs_INPD_${i} > lista_files_INPD_${i} ; done
+for i in {1..12}; do sed 's/INPD_${i}_ref.//g' IDs_INPD_${i} > lista_files_INPD_${i} ; done
 
 # mudar cabecalho só do primeiro arquivo, de ID para Name, de POS para Position e de CHROM para Chr
 # Para sair do vi salvando: ESC ":x"
@@ -59,7 +59,7 @@ for i in {10..10}; do detect_cnv_header.pl -test -hmm /home/julia.arendt/IC_JA/P
 PennCNV - controle de qualidade (Malú)
 
 # 1. QC por amostra
-./filter_cnv.pl ~/IC_JA/gatk-4.2.0.0/INPD10.rawcnv -qclogfile ~/IC_JA/gatk-4.2.0.0/INPD10.log -qclrrsd 0.3 -qcpassout INPD10.qcpass -qcsumout INPD10.qcsum -qcnumcnv 100 -out INPD10.goodcnv
+for i in {1..12}; do ./filter_cnv.pl ~/IC_JA/gatk-4.2.0.0/INPD_${i}.rawcnv -qclogfile ~/IC_JA/gatk-4.2.0.0/INPD_${i}.log -qclrrsd 0.3 -qcpassout INPD_${i}.qcpass -qcsumout INPD_${i}.qcsum -qcnumcnv 100 -out INPD_${i}.goodcnv ; done
 
 
 ## No R, usando o arquivo .qcsum. Visualização da distribuição de CNVs por pacientes (não fiz!)
@@ -75,60 +75,55 @@ barplot(eshg$NumCNV, ylim = c(0,30), main = "CNVs por amostra", xlab = "Paciente
 ### Arquivo centromerescerto.txt achado na internet
 # awk '{print $1":"$2"-"$3}' centromere.txt > centromerescerto.txt
 
-./scan_region.pl sd22_affy.goodcnv centromerescerto.txt -minqueryfrac 0.5 > cnvcall.cen
-fgrep -v -f cnvcall.cen sd22_affy.goodcnv > sd22_affy_cen.clean
+for i in {1..12}; do ./scan_region.pl INPD_${i}.goodcnv centromerescerto.txt -minqueryfrac 0.5 > INPD_${i}_cnvcall.cen ; done
+for i in {1..12}; do fgrep -v -f INPD_${i}_cnvcall.cen INPD_${i}.goodcnv > INPD_${i}_cen.clean ; done
 
 
 ## Teloméricas:
 ### Arquivo telomeres.txt feito com 10000bp de diferença - Genome Browser
 
-./scan_region.pl sd22_affy_cen.clean telomeres.txt -minqueryfrac 0.5 > cnvcall.tel
-fgrep -v -f cnvcall.tel sd22_affy_cen.clean > sd22_affy_cen_tel.clean
+for i in {1..12}; do ./scan_region.pl INPD_${i}_cen.clean telomeres.txt -minqueryfrac 0.5 > INPD_${i}_cnvcall.tel ; done
+for i in {1..12}; do fgrep -v -f INPD_${i}_cnvcall.tel INPD_${i}_cen.clean > INPD_${i}_cen_tel.clean ; done
 
 
 ## Duplicações segmentais, exceto 22q11.2: 
 ### Arquivo segdup_hg19certo.bed feito em https://genome.ucsc.edu/cgi-bin/hgTables (group: Repeats; tracks: Segmental Dups; table: genomicSuperDups)
-tail -n +2 segdup.txt | awk '{print $2,$3, $4}'| sed 's/ /\t/g' > segdup_hg19.bed
-awk '{print $1":"$2"-"$3}' segdup_hg19.bed > segdup_hg19certo.bed
+# tail -n +2 segdup.txt | awk '{print $2,$3, $4}'| sed 's/ /\t/g' > segdup_hg19.bed
+# awk '{print $1":"$2"-"$3}' segdup_hg19.bed > segdup_hg19certo.bed
 
-./scan_region.pl sd22_affy_cen_tel.clean segdup_hg19certo.bed -minqueryfrac 0.5 > cnvcall.segdup
-fgrep -v -f cnvcall.segdup sd22_affy_cen_tel.clean > sd22_affy_cen_tel_segdup.clean
+for i in {1..12}; do ./scan_region.pl INPD_${i}_cen_tel.clean segdup_hg19certo.bed -minqueryfrac 0.5 > INPD_${i}_cnvcall.segdup ; done
+for i in {1..12}; do fgrep -v -f INPD_${i}_cnvcall.segdup INPD_${i}_cen_tel.clean > INPD_${i}_cen_tel_segdup.clean ; done
 
 
 ## Regiões de imunoglobulinas:
 ### Não achei arquivo para hg19
 
-./scan_region.pl sd22_affy_cen_tel_segdup.clean immuno_region -minqueryfrac 0.5 > cnvcall.immuno 
-fgrep -v -f cnvcall.immuno sd22_affy_cen_tel_segdup.clean > sd22_affy_cen_tel_segdup_immuno.clean
+# ./scan_region.pl sd22_affy_cen_tel_segdup.clean immuno_region -minqueryfrac 0.5 > cnvcall.immuno 
+# fgrep -v -f cnvcall.immuno sd22_affy_cen_tel_segdup.clean > sd22_affy_cen_tel_segdup_immuno.clean
 
 
 # 3. Merge
-./clean_cnv.pl -signalfile ashg.329 combineseg sd22_affy_cen_tel_segdup_immuno.clean > sd22_affy_cen_tel_segdup_immuno_merged.clean
+for i in {1..12} ./clean_cnv.pl -signalfile ~/IC_JA/gatk-4.2.0.0/INPD.pfb --fraction 0.5 combineseg INPD_${i}_cen_tel_segdup.clean > INPD_${i}_cen_tel_segdup_merged.clean ; done
 
-signalfile: a file that contains Chr and Position for SNPs/markers
-Observação: fraction 0.2 (default)
-
-### Não fiz
+#signalfile: a file that contains Chr and Position for SNPs/markers
+#Observação: fraction 0.5/50% (default)
 
 
 # 4. Mínimo de sondas:
 
 ## Deleções (20 sondas):
-./filter_cnv.pl -numsnp 10 -length 1k -type del sd22_affy_cen_tel_segdup_immuno_merged.clean -output sd22_affy_del.clean
+for i in {1..12}; do ./filter_cnv.pl -numsnp 10 -length 1k -type del INPD_${i}_cen_tel_segdup.clean -output INPD_${i}_del.clean ; done
 
 
 ## Duplicações (20 sondas):
-./filter_cnv.pl -numsnp 10 -length 1k -type dup sd22_affy_cen_tel_segdup_immuno_merged.clean -output sd22_affy_dup.clean
+for i in {1..12}; do ./filter_cnv.pl -numsnp 10 -length 1k -type dup INPD_${i}_cen_tel_segdup.clean -output INPD_${i}_dup.clean ; done
 
 
 # 5. Juntar arquivos com deleções e duplicações:
-cat sd22_affy_del.clean sd22_affy_dup.clean > sd22_affy_del_dup.clean
+for i in {1..12}; do cat INPD_${i}_del.clean INPD_${i}_dup.clean > INPD_${i}_del_dup.clean ; done
 
 
 # 6. Ordenar pela primeira coluna 
-sort -rk 1 sd22_affy_del_dup.clean > deldup.ordenado
-
-
-
+for i in {1..12} sort -rk 1 INPD_${i}_del_dup.clean > INPD_deldup_${i}.ordenado ; done
 
 
