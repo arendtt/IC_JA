@@ -112,11 +112,11 @@ for i in {1..12} ./clean_cnv.pl -signalfile ~/IC_JA/gatk-4.2.0.0/INPD.pfb --frac
 # 4. Mínimo de sondas:
 
 ## Deleções (20 sondas):
-for i in {1..12}; do ./filter_cnv.pl -numsnp 10 -length 1k -type del INPD_${i}_cen_tel_segdup.clean -output INPD_${i}_del.clean ; done
+for i in {1..12}; do ./filter_cnv.pl -numsnp 10 -length 1k -type del INPD_${i}_cen_tel_segdup_merged.clean -output INPD_${i}_del.clean ; done
 
 
 ## Duplicações (20 sondas):
-for i in {1..12}; do ./filter_cnv.pl -numsnp 10 -length 1k -type dup INPD_${i}_cen_tel_segdup.clean -output INPD_${i}_dup.clean ; done
+for i in {1..12}; do ./filter_cnv.pl -numsnp 10 -length 1k -type dup INPD_${i}_cen_tel_segdup_merged.clean -output INPD_${i}_dup.clean ; done
 
 
 # 5. Juntar arquivos com deleções e duplicações:
