@@ -1,0 +1,87 @@
+Instalar as Bibliotecas Necessárias
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("CNVgears")
+install.packages("tidyverse")
+
+Separar as CNVs em duplicações e deleções
+library(tidyverse)
+library(CNVgears)
+modifiersCNV <- read.delim(FINAL, header = T)
+       Deleções
+modifier_del <- dplyr::filter(modifiersCNV, CNV_state == “cn=1”) 
+modifier_del <- dplyr::filter(modifiersCNV, CNV_state == “cn=0”)
+write.table(modifier_del, "del_INPD_filtered.txt", quote = F, sep = "\t", col.names = T, row.names = F)
+       Duplicações
+modifier_dup <- dplyr::filter(modifiersCNV, CNV_state == "cn=3")
+modifier_dup <- dplyr::filter(modifiersCNV, CNV_state == "cn=4")
+write.table(modifier_dup, "dup_INPD_filtered.txt", quote = F, sep = "\t", col.names = T, row.names = F)
+
+Definir CNVRs na Amostra
+Importar informações do PFB
+axiompmda_markers <- read_finalreport_snps(INPD.pfb, mark_ID_col = "Name", chr_col = "Chr", pos_col = "Position")
+sample_INPD <- as.data.table(cbind(unique(modifiersCNV$AG), c(0), c(0), c(0)))
+colnames(sample_INPD) <- c("sample_ID", "sex", "role", "fam_ID" )
+
+Converter para o formato de input do CNVgears
+       Duplicações
+INPD_results_dup <- read_results(DT_path = "dup_INPD_filtered.txt",
+res_type = "file",
+DT_type = "TSV/CSV",
+chr_col = "Chromosome",
+start_col = "Start_Position_bp",
+end_col = "End_Position_bp",
+CN_col = "Copy_Number",
+samp_ID_col = "ID",
+markers = axiompmda_markers,
+method_ID = "P",
+sample_list = sample_INPD,
+do_merge = F)
+       Duplicações
+INPD_results_del <- read_results(DT_path = "del_INPD_filtered.txt",
+res_type = "file",
+DT_type = "TSV/CSV",
+chr_col = "Chromosome",
+start_col = "Start_Position_bp",
+end_col = "End_Position_bp",
+CN_col = "Copy_Number",
+samp_ID_col = "ID",
+markers = axiompmda_markers,
+method_ID = "P",
+sample_list = sample_INPD,
+do_merge = F)
+
+Gerar CNVRs
+## Com sobreposição recíproca de 50%:
+
+       Duplicações
+INPD_cnvr_dup <- cnvrs_create(INPD_results_dup, chr_arms = hg19_chr_arms, prop = 0.5)
+
+nrow(INPD_cnvr_dup[[1]])
+# Gerou 1229 CNVRs para duplicações
+
+max(INPD_cnvr_dup[[1]]$freq)
+# A CNVR dup com maior frequência está presente em 270 indivíduos
+
+       Deleções
+INPD_cnvr_del <- cnvrs_create(INPD_results_del, chr_arms = hg19_chr_arms, prop = 0.5)
+
+nrow(INPD_cnvr_del[[1]])
+# Gerou 1231 CNVRs para deleções
+
+max(INPD_cnvr_del[[1]]$freq)
+# A CNVR del com maior frequência está presente em 467 indivíduos
+
+
+       4)    Calcular a frequência das CNVs na amostra
+## Total de indivíduos analisados na coorte: 5364
+
+      Duplicações
+INPD_cnvr_dup_freq <- INPD_cnvr_dup[[1]]
+INPD_cnvr_dup_freq$Cohort_Gain_Frequency_percentage <- (INPD_cnvr_dup_freq$freq/5364) * 100
+
+       Deleções:
+INPD_cnvr_del_freq <- INPD_cnvr_del[[1]]
+INPD_cnvr_del_freq$Cohort_Loss_Frequency_percentage <-
+(INPD_cnvr_del_freq$freq/5364) * 100
