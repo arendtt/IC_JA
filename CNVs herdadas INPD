@@ -1,0 +1,38 @@
+# Duplicações (o mesmo vale para deleções):
+###OBS: como neste caso a tabela já tinha uma coluna separada para início e fim da variante, não foi necessário fazer essas colunas com gsub
+
+## Juntar tabela com duplicações e espelho para conseguir separar os indivíduos por famílias, pois na sd22 consta o ID individual
+colnames(espelho)[2] <- "ID_INPD"
+sd22_results_dup$sample_ID <- gsub("INPD_.*_ref.","",sd22_results_dup$sample_ID)
+colnames(sd22_results_dup)[5] <- "ID_INPD"
+library(dplyr)
+inner_join(espelho,sd22_results_dup, by="ID_INPD") -> dup_espelho
+
+## Como o family ID está escrito na forma letra (P, M, C) + número da família, fazer uma coluna apenas com o número relacionado a cada família
+dup_espelho[,c(1,3,9,10,11,12,14,15)] <- NULL
+dup_espelho$familyID <- gsub("M","",dup_espelho$V4)
+dup_espelho$familyID <- gsub("C","",dup_espelho$familyID)
+dup_espelho$familyID <- gsub("P","",dup_espelho$familyID)
+
+## Fazer uma tabela para cada indivíduo da família
+crianca_dup <- dup_espelho [grepl ("C",dup_espelho$V4),]
+mae_dup <- dup_espelho [grepl ("M",dup_espelho$V4),]
+pai_dup <- dup_espelho [grepl ("P",dup_espelho$V4),]
+
+## Juntar as tabelas mãe-criança e corrigir pelo family ID para posteriormente selecionar as CNVs herdadas
+source("http://bioconductor.org/biocLite.R")
+biocLite("IRanges")
+ranges_dup <- merge(crianca_dup,mae_dup,by="chr",suffixes=c("C","M"))
+ranges_MC_dup <- ranges_dup[ranges_dup$familyIDC == ranges_dup$familyIDM ,]
+MC_dup_herdadas <- ranges_MC_dup[with(ranges_MC_dup, (startC <= startM & endC >= endM)|(startM <= startC & endM >= endC)),]
+
+## Juntar as tabelas pai-criança e corrigir pelo family ID para posteriormente selecionar as CNVs herdadas
+ranges_PC_dup <- merge(crianca_dup,pai_dup,by="chr",suffixes=c("C","P"))
+range_PC_dup_2 <- ranges_PC_dup[ranges_PC_dup$familyIDC == ranges_PC_dup$familyIDP,]
+PC_dup_herdadas <- range_PC_dup_2[with(range_PC_dup_2, (startC <= startP & endC >= endP)|(startP <= startC & endP >= endC)),]
+
+# Nomes dos arquivos salvos no computador:
+write.table (MC_herdadas_teste, "MC_del_herdadas")
+write.table (MC_dup_herdadas, "MC_dup_herdadas")
+write.table (PC_dup_herdadas, "PC_dup_herdadas")
+write.table (PC_herdadas_teste, "PC_del_herdadas")
