@@ -1,6 +1,8 @@
 # Duplicações (o mesmo vale para deleções):
 ###OBS: como neste caso a tabela já tinha uma coluna separada para início e fim da variante, não foi necessário fazer essas colunas com gsub
 
+espelho <- read.table(file = "../Espelho_INPD_todos_nov19.txt")
+
 ## Juntar tabela com duplicações e espelho para conseguir separar os indivíduos por famílias, pois na sd22 consta o ID individual
 colnames(espelho)[2] <- "ID_INPD"
 sd22_results_dup$sample_ID <- gsub("INPD_.*_ref.","",sd22_results_dup$sample_ID)
