@@ -96,10 +96,14 @@ for i in {1..12}; do fgrep -v -f INPD_${i}_cnvcall.segdup INPD_${i}_cen_tel.clea
 
 
 ## Regiões de imunoglobulinas:
-### Não achei arquivo para hg19
+### Fiz o arquivo immuno_hg19 com as seguintes regiões: 
+    # chr22:22385572-23265082
+    # chr14:105994256-107281230
+    # chr2:89156874-89630187
+    # chr14:22090057-23021097
 
-# ./scan_region.pl sd22_affy_cen_tel_segdup.clean immuno_region -minqueryfrac 0.5 > cnvcall.immuno 
-# fgrep -v -f cnvcall.immuno sd22_affy_cen_tel_segdup.clean > sd22_affy_cen_tel_segdup_immuno.clean
+for i in {1..12} ./scan_region.pl INPD_${i}_cen_tel_segdup.clean immuno_hg19 -minqueryfrac 0.5 > INPD_${i}_cnvcall.immuno 
+for i in {1..12} fgrep -v -f INPD_${i}_cnvcall.immuno INPD_${i}_cen_tel_segdup.clean > INPD_${i}_cen_tel_segdup_immuno.clean
 
 
 # 3. Merge
