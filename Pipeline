@@ -102,8 +102,8 @@ for i in {1..12}; do fgrep -v -f INPD_${i}_cnvcall.segdup INPD_${i}_cen_tel.clea
     # chr2:89156874-89630187
     # chr14:22090057-23021097
 
-for i in {1..12} ./scan_region.pl INPD_${i}_cen_tel_segdup.clean immuno_hg19 -minqueryfrac 0.5 > INPD_${i}_cnvcall.immuno 
-for i in {1..12} fgrep -v -f INPD_${i}_cnvcall.immuno INPD_${i}_cen_tel_segdup.clean > INPD_${i}_cen_tel_segdup_immuno.clean
+for i in {1..12}; do ./scan_region.pl INPD_${i}_cen_tel_segdup.clean immuno_hg19 -minqueryfrac 0.5 > INPD_${i}_cnvcall.immuno; done 
+for i in {1..12}; do fgrep -v -f INPD_${i}_cnvcall.immuno INPD_${i}_cen_tel_segdup.clean > INPD_${i}_cen_tel_segdup_immuno.clean; done
 
 
 # 3. Merge
