@@ -1,0 +1,14 @@
+## CNVburden
+
+final_INPD_deldup <- read.table(file="final_INPD_deldup", header=FALSE)
+final_INPD_deldup$length <- gsub("length=", "", final_INPD_deldup$length)
+colnames(final_INPD_deldup)[3] <- "length"
+colnames(final_INPD_deldup)[5] <- "ID_INPD"
+final_INPD_deldup$ID_INPD <- gsub("INPD_.*_ref.","",final_INPD_deldup$ID_INPD)
+final_INPD_deldup$length <- gsub(",", "", final_INPD_deldup$length)
+final_INPD_deldup$length <- as.numeric(final_INPD_deldup$length)
+
+# Goma o tamanho das CNVs para cada indivíduo
+CNVburden <- cbind(aggregate(length ~ ID_INPD, final_INPD_deldup, sum )) 
+
+# Gráfico disorder x CNVburden
