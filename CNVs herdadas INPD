@@ -22,8 +22,9 @@ mae_dup <- dup_espelho [grepl ("M",dup_espelho$V4),]
 pai_dup <- dup_espelho [grepl ("P",dup_espelho$V4),]
 
 ## Juntar as tabelas mãe-criança e corrigir pelo family ID para posteriormente selecionar as CNVs herdadas
-source("http://bioconductor.org/biocLite.R")
-biocLite("IRanges")
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install(version = "3.16")
 ranges_dup <- merge(crianca_dup,mae_dup,by="chr",suffixes=c("C","M"))
 ranges_MC_dup <- ranges_dup[ranges_dup$familyIDC == ranges_dup$familyIDM ,]
 MC_dup_herdadas <- ranges_MC_dup[with(ranges_MC_dup, (startC <= startM & endC >= endM)|(startM <= startC & endM >= endC)),]
