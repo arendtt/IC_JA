@@ -1,0 +1,7 @@
+https://hub.docker.com
+
+docker pull genomicslab/penncnv # puxar a imagem do docker após ele estar instalado
+
+docker run genomicslab/penncnv /home/user/PennCNV/detect_cnv.pl # rodar comando com PennCNV sem entrar no docker
+
+docker run -it -v /mnt/genetica_1/JuliaArendt:/mounted genomicslab/penncnv # entrar no docker e passar tudo da minha pasta para o mounted (mounted foi criada)
