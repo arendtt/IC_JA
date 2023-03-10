@@ -1,0 +1,288 @@
+## CNVburden
+
+library(tidyverse)
+library(plyr)
+
+final_INPD_deldup <- read.table(file="final_INPD_deldup1", header=FALSE)
+colnames(final_INPD_deldup)[3] <- "length"
+final_INPD_deldup$length <- gsub("length=", "", final_INPD_deldup$length)
+colnames(final_INPD_deldup)[5] <- "ID_INPD"
+final_INPD_deldup$ID_INPD <- gsub("INPD_.*_ref.","",final_INPD_deldup$ID_INPD)
+final_INPD_deldup$length <- gsub(",", "", final_INPD_deldup$length)
+final_INPD_deldup$length <- as.numeric(final_INPD_deldup$length)
+
+CNVburden <- cbind(aggregate(length ~ ID_INPD, final_INPD_deldup, sum ))
+
+CNVburden <- join_all(list(espelho, CNVburden), by = "ID_INPD")
+
+write.table(CNVburden, "CNVburden")
+
+# Separar entre Crianças e Pais
+C_CNVburden <- CNVburden[grepl("C*", CNVburden$V4),]
+
+PM_CNVburden <- CNVburden[grepl("P", CNVburden$V4) | grepl("M",CNVburden$V4),]
+
+
+# Juntar tabelas 
+C_CNVburden_pheno <- join_all(list(C_CNVburden, Pheno_Children_Jun20_PGC), by = "subjectid")
+
+PM_CNVburden_pheno <- join_all(list(PM_CNVburden, MINIeFLI), by = "a")
+
+PM_CNVburden_pheno$length[is.na(PM_CNVburden_pheno$length)] <- 0
+
+C_CNVburden_pheno$length[is.na(C_CNVburden_pheno$length)] <- 0
+
+
+#####
+# Gráficos teste
+
+boxplot(C_CNVburden$length ~ C_CNVburden$group) # RS e SP
+boxplot(PM_CNVburden_pheno$length ~ PM_CNVburden_pheno$AnyPsyDisorder)
+boxplot(PM_CNVburden_pheno$length[PM_CNVburden_pheno$length<7000000] ~ PM_CNVburden_pheno$AnyPsyDisorder[PM_CNVburden_pheno$length<7000000])
+boxplot(PM_CNVburden_pheno$length[PM_CNVburden_pheno$length<7000000 & PM_CNVburden_pheno$length > 700] ~ PM_CNVburden_pheno$AnyPsyDisorder[PM_CNVburden_pheno$length<7000000 & PM_CNVburden_pheno$length > 700])
+boxplot(PM_CNVburden_pheno$length[PM_CNVburden_pheno$length<7000000 & PM_CNVburden_pheno$length > 5000000] ~ PM_CNVburden_pheno$AnyPsyDisorder[PM_CNVburden_pheno$length<7000000 & PM_CNVburden_pheno$length > 5000000])
+boxplot(PM_CNVburden_pheno$length[PM_CNVburden_pheno$length<7000000 & PM_CNVburden_pheno$length > 3000000] ~ PM_CNVburden_pheno$AnyPsyDisorder[PM_CNVburden_pheno$length<7000000 & PM_CNVburden_pheno$length > 3000000])
+boxplot(PM_CNVburden_pheno$length ~ PM_CNVburden_pheno$SCZ)
+boxplot(PM_CNVburden_pheno$length ~ PM_CNVburden_pheno$ANX)
+boxplot(PM_CNVburden_pheno$length ~ PM_CNVburden_pheno$BD)
+#####
+
+# Gráficos CNVburden x Pheno
+library(ggplot2)
+library(tidyverse)
+library(scales)
+library(RColorBrewer)
+
+RColorBrewer::display.brewer.all()
+
+
+C_CNVburden_pheno <- mutate(C_CNVburden_pheno, 
+                AnyPsyDisorder = factor(AnyPsyDisorder, labels=c("Controle","Caso")),
+                group = factor(group, labels=c("Rio Grande do Sul", "São Paulo")))
+
+PM_CNVburden_pheno <- mutate(PM_CNVburden_pheno,
+                             AnyPsyDisorder = factor(AnyPsyDisorder, labels=c("Controle", "Caso")))
+
+# Crianças: Any 
+ggplot(na.omit(C_CNVburden_pheno)) +
+  geom_boxplot(aes(x = AnyPsyDisorder, y= length, fill=AnyPsyDisorder)) +
+  labs(title = "Probandos: Comparação do CNVburden nos grupos Caso e Controle",
+       y="CNVburden",
+       x="Diagnóstico Psiquiátrico") +
+  scale_y_continuous(labels = label_number()) +
+  scale_fill_brewer(palette = "Set2") +
+  guides(fill = FALSE) + # remove a legenda
+  theme_minimal()
+
+# Crianças: Região 
+ggplot(na.omit(C_CNVburden)) +
+  geom_boxplot(aes(x = group, y= length, fill=group)) +
+  labs(title = "Probandos: Comparação do CNVburden nos diferentes estados",
+       y="CNVburden",
+       x="Estados") +
+  scale_y_continuous(labels = label_number()) +
+  scale_fill_brewer(palette = "Set4") +
+  guides(fill = FALSE) + # remove a legenda
+  theme_minimal()
+
+# Pai + Mãe: Any
+ggplot(na.omit(PM_CNVburden_pheno)) +
+  geom_boxplot(aes(x = AnyPsyDisorder, y= length, fill=AnyPsyDisorder)) +
+  labs(title = "Genitores: Comparação do CNVburden nos grupos Caso e Controle",
+       y="CNVburden",
+       x="Diagnóstico Psiquiátrico") +
+  scale_y_continuous(labels = label_number()) +
+  scale_fill_brewer(palette = "Set2") +
+  guides(fill = FALSE) + # remove a legenda
+  theme_minimal()
+
+# Sem NA
+
+PM_CNVburden_pheno %>% drop_na(AnyPsyDisorder) %>% 
+  ggplot() + 
+  geom_boxplot(aes(x = AnyPsyDisorder, y= length, fill=AnyPsyDisorder)) +
+  labs(title = "Genitores: Comparação do CNVburden nos grupos Caso e Controle",
+       y="CNVburden",
+       x="Diagnóstico Psiquiátrico") +
+  scale_y_continuous(labels = label_number()) +
+  scale_fill_brewer(palette = "Set2") +
+  guides(fill = FALSE) + # remove a legenda
+  theme_minimal()
+
+# Mãe: Any
+
+M_CNVburden %>% drop_na(AnyPsyDisorder) %>% 
+  ggplot() + 
+  geom_boxplot(aes(x = AnyPsyDisorder, y= length, fill=AnyPsyDisorder)) +
+  labs(title = "Mães: Comparação do CNVburden nos grupos Caso e Controle",
+       y="CNVburden",
+       x="Diagnóstico Psiquiátrico") +
+  scale_y_continuous(labels = label_number()) +
+  scale_fill_brewer(palette = "Set2") +
+  guides(fill = FALSE) + # remove a legenda
+  theme_minimal()
+
+# Pai: Any
+P_CNVburden %>% drop_na(AnyPsyDisorder) %>% 
+  ggplot() + 
+  geom_boxplot(aes(x = AnyPsyDisorder, y= length, fill=AnyPsyDisorder)) +
+  labs(title = "Pais: Comparação do CNVburden nos grupos Caso e Controle",
+       y="CNVburden",
+       x="Diagnóstico Psiquiátrico") +
+  scale_y_continuous(labels = label_number()) +
+  scale_fill_brewer(palette = "Set2") +
+  guides(fill = FALSE) + # remove a legenda
+  theme_minimal()
+
+
+#####
+
+W0_C_CNVburden_cog <- C_CNVburden_cog [C_CNVburden_cog$redcap_event_name == "wave0_arm_1",]
+W1_C_CNVburden_cog <- C_CNVburden_cog [C_CNVburden_cog$redcap_event_name == "wave1_arm_1",]
+W2_C_CNVburden_cog <- C_CNVburden_cog [C_CNVburden_cog$redcap_event_name == "wave2_arm_1",]
+
+
+# Relacionando com:
+
+library(ggplot2)
+library(scales)
+library(tidyverse)
+
+
+## Ocupação
+
+ocupa_CNVburden <- join_all(list(C_CNVburden, BHRCS_Educ_Cog_w0w1w2), by = "subjectid")
+
+ocupa_CNVburden <- mutate(ocupa_CNVburden,
+                          NEET_15 = factor(NEET_15, labels=c("Sim", "Não")))
+
+ocupa_CNVburden %>% drop_na(NEET_15) %>% 
+  ggplot() + 
+  geom_boxplot(aes(x = NEET_15, y= length, fill= NEET_15)) +
+  labs(title = "Probandos: associação entre CNVburden e ocupação",
+       y="CNVburden",
+       x="Está estudando, empregado ou em treinamento") +
+  scale_y_continuous(labels = label_number()) +
+  scale_fill_brewer(palette = "Set3") +
+  guides(fill = FALSE) + # remove a legenda
+  theme_minimal()
+
+W2_C_CNVburden_cog <- mutate(W2_C_CNVburden_cog,
+                          NEET_15 = factor(NEET_15, labels=c("Sim", "Não")))
+
+W2_C_CNVburden_cog %>% drop_na(NEET_15) %>% 
+  ggplot() + 
+  geom_boxplot(aes(x = NEET_15, y= length, fill= NEET_15)) +
+  labs(title = "Probandos: associação entre CNVburden e ocupação",
+       y="CNVburden",
+       x="Está estudando, empregado ou em treinamento") +
+  scale_y_continuous(labels = label_number()) +
+  scale_fill_brewer(palette = "Set4") +
+  guides(fill = FALSE) + # remove a legenda
+  theme_minimal()
+
+## Cognição - QI
+
+W2_C_CNVburden_cog <- mutate(W2_C_CNVburden_cog,
+                          IQ_group = factor(IQ_group, labels=c("Abaixo da média", "Médio", "Acima da média")))
+
+ocupa_CNVburden %>% drop_na(IQ_group) %>% 
+  ggplot() + 
+  geom_boxplot(aes(x = IQ_group, y= length, fill= IQ_group)) +
+  labs(title = "Probandos: associação entre CNVburden e QI",
+       y="CNVburden",
+       x="QI") +
+  scale_y_continuous(labels = label_number()) +
+  scale_fill_brewer(palette = "Set") +
+  guides(fill = FALSE) + # remove a legenda
+  theme_minimal()
+
+ggplot(ocupa_CNVburden, aes(x = IQ, y = length)) +
+  geom_point() +
+  geom_smooth(aes(x = IQ, y = length),
+              se = FALSE,
+              method = "lm") +
+  ggtitle("QI em relação ao CNV burden") + 
+  ylab("CNV burden") +
+  xlab("QI") +
+  scale_y_continuous(labels = label_number()) +
+  theme_minimal()
+
+## Cognição - Função Executiva
+
+ggplot(ocupa_CNVburden, aes(x = ef_fl, y = length)) +
+       geom_point() +
+       geom_smooth(aes(x = ef_fl, y = length),
+                                     se = FALSE,
+                                     method = "lm") +
+       ggtitle("Função executiva em relação ao CNV burden") + 
+       ylab("CNV burden") +
+       xlab("Função executiva") +
+       scale_y_continuous(labels = label_number()) +
+       theme_minimal()
+
+## Desempenho escolar - Escrita
+
+ggplot(ocupa_CNVburden, aes(x = tde_write, y = length)) +
+  geom_point() +
+  geom_smooth(aes(x = tde_write, y = length),
+              se = FALSE,
+              method = "lm") +
+  ggtitle("Habilidade de escrita em relação ao CNV burden") + 
+  ylab("CNV burden") +
+  xlab("Escore de habilidade de escrita") +
+  scale_y_continuous(labels = label_number()) +
+  theme_minimal()
+
+
+## Desempenho escolar - Leitura
+
+ggplot(ocupa_CNVburden, aes(x = tde_read, y = length)) +
+  geom_point() +
+  geom_smooth(aes(x = tde_read, y = length),
+              se = FALSE,
+              method = "lm") +
+  ggtitle("Habilidade de leitura em relação ao CNV burden") + 
+  ylab("CNV burden") +
+  xlab("Escore de habilidade de leitura") +
+  scale_y_continuous(labels = label_number()) +
+  theme_minimal()
+
+# Para cada CNV:
+
+C_final_INPD_deldup <- final_INPD_deldup_espelho [grepl("C", final_INPD_deldup_espelho$subjectid),]
+
+C_final_INPD_del <- C_final_INPD_deldup [grepl ("*cn=0", C_final_INPD_deldup$V4) | grepl ("*cn=1", C_final_INPD_deldup$V4),]
+C_final_INPD_dup <- C_final_INPD_deldup [grepl ("*cn=4", C_final_INPD_deldup$V4) | grepl ("*cn=3", C_final_INPD_deldup$V4),]
+
+C_final_INPD_del$subjectid <- gsub("C", "", C_final_INPD_del$subjectid)
+C_final_INPD_dup$subjectid <- gsub("C", "", C_final_INPD_dup$subjectid)
+
+C_final_INPD_dup_cog <- join_all(list(C_final_INPD_dup, BHRCS_Educ_Cog_w0w1w2), by = "subjectid")
+C_final_INPD_del_cog <- join_all(list(C_final_INPD_del, BHRCS_Educ_Cog_w0w1w2), by = "subjectid")
+
+## dup 8p23.2
+
+IDs_CNV_dup8p <- C_final_INPD_dup [grepl("chr8:219.*", final_INPD_deldup$V1),]
+
+C_CNVburden$dup8p <- ifelse(C_CNVburden$V4 %in% CNV_dup_8p$subjectid,1,0)
+
+W0_C_CNVburden_cog %>% drop_na(dup8p) %>% 
+  ggplot() + 
+  geom_boxplot(aes(x = dup8p, y= IQ_group, fill= dup8p)) +
+  labs(title = "Probandos: associação entre CNVburden e QI",
+       y="CNVburden",
+       x="QI") +
+  scale_y_continuous(labels = label_number()) +
+  scale_fill_brewer(palette = "Set") +
+  guides(fill = FALSE) + # remove a legenda
+  theme_minimal()
+
+## del 10q23
+
+IDs_CNV_del10q23 <- C_final_INPD_del [grepl("chr10:89.*", C_final_INPD_del$V1),]
+
+C_CNVburden_cog$del10q23 <- ifelse(C_CNVburden_cog$subjectid %in% IDs_CNV_del10q23$subjectid,1,0)
+
+C_CNVburden_cog <- mutate(C_CNVburden_cog,
+                          del10q23 = factor (del10q23, labels=c("Sem CNV 10q23", "Com CNV 10q23")))
