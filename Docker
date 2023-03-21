@@ -8,5 +8,7 @@ docker run -it -v /mnt/genetica_1/JuliaArendt:/mounted genomicslab/penncnv # ent
 
 Entrar no R antes e [
 
-install.packeges("plyr")
-install.packeges("stringr")
+install.packages("plyr")
+install.packages("stringr")
+library(plyr)
+library(stringr)
