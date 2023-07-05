@@ -1,0 +1,37 @@
+## Análises para Resumo SBG
+## Autor: Julia Arendt
+
+#OBS: 1 = Controle; 2= Caso; -9= outro transtorno
+
+library(dplyr)
+library(tidyverse)
+library(plyr)
+
+# 1. MDD
+
+MDD_C <- Pheno_Children_Jun20_PGC %>% filter(MDD == 2)
+MDD_C_dup <- join_all(list(MDD_C, C_final_INPD_dup), by = "subjectid")
+MDD_C_del <- join_all(list(MDD_C, C_final_INPD_del), by = "subjectid")
+MDD_C_del <- na.omit(MDD_C_del)
+MDD_C_dup <- na.omit(MDD_C_dup)
+
+# 2. ANX
+ANX_C <- Pheno_Children_Jun20_PGC %>% filter(ANX == 2)
+ANX_C_dup <- join_all(list(ANX_C, C_final_INPD_dup), by = "subjectid")
+ANX_C_del <- join_all(list(ANX_C, C_final_INPD_del), by = "subjectid")
+ANX_C_del <- na.omit(ANX_C_del)
+ANX_C_dup <- na.omit(ANX_C_dup)
+
+# 3. ADHD
+ADHD_C <- Pheno_Children_Jun20_PGC %>% filter(ADHD == 2)
+ADHD_C_dup <- join_all(list(ADHD_C, C_final_INPD_dup), by = "subjectid")
+ADHD_C_del <- join_all(list(ADHD_C, C_final_INPD_del), by = "subjectid")
+ADHD_C_del <- na.omit(ADHD_C_del)
+ADHD_C_dup <- na.omit(ADHD_C_dup)
+
+# 4. Controle
+control_C <- Pheno_Children_Jun20_PGC %>% filter(AnyPsyDisorder == 1)
+control_C_dup <- join_all(list(control_C, C_final_INPD_dup), by = "subjectid")
+control_C_del <- join_all(list(control_C, C_final_INPD_del), by = "subjectid")
+control_C_del <- na.omit(control_C_del)
+control_C_dup <- na.omit(control_C_dup)
