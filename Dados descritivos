@@ -1,0 +1,92 @@
+#### Julia Arendt 17/05/2023 - 03/06/2023
+#### Tabelas descritivas dos artigos
+
+library(dplyr)
+library(gtsummary)
+
+art_desc_dem <- Van3 %>% select(c(1,2,4,9)) 
+
+art_desc_dem %>%
+tbl_summary(
+by = redcap_event_name,
+statistic = list(all_continuous() ~ "{median} ({p25}-{p75})",
+all_categorical() ~ "{n} ({p}%)"),
+digits = list(all_continuous() ~ 2,
+all_categorical() ~ c(0,0)))
+
+
+art_desc_age <- Santoro_157BHRC_2023_04_12 %>% select(c(1,2,6,15))
+
+art_desc_age %>%
+tbl_summary(
+by = redcap_event_name,
+statistic = list(all_continuous() ~ "{median} ({p25}-{p75})",
+all_categorical() ~ "{n} ({p}%)"),
+digits = list(all_continuous() ~ 2,
+all_categorical() ~ c(0,0)))
+
+art_desc_cog <- BHRCS_Educ_Cog_w0w1w2 %>% select(c(1,3,15,17,18,19,20,21))
+
+art_desc_cogage <- left_join(art_desc_cog, art_desc_age, by=c("ident", "redcap_event_name"))
+
+art_desc_cogage %>%
+  tbl_summary(
+    by = redcap_event_name,
+    statistic = list(all_continuous() ~ "{median} ({p25}-{p75})",
+                     all_categorical() ~ "{n} ({p}%)"),
+    digits = list(all_continuous() ~ 2,
+                  all_categorical() ~ c(0,0)))
+
+
+# Gráfico CNVs em Transtornos
+
+library(ggplot2)
+
+## n de CNVs
+
+count <- c(635, 366, 842, 445, 678, 379, 2396, 1258)
+deldup <- c("del", "dup", "del", "dup", "del", "dup", "del", "dup")
+vet <- c("ADHD", "ADHD", "ANX", "ANX", "MDD", "MDD", "control", "control")
+grafico_CNVTM <- data.frame(vet,count,deldup)
+
+grafico_CNVTM$vet <- factor(grafico_CNVTM$vet,levels = c("ADHD", "ANX", "MDD", "control"))
+
+ggplot(grafico_CNVTM,aes(x=vet, y = ifelse(deldup == "dup", count, -count), fill=deldup)) +
+  geom_bar(stat="identity", position="identity")+
+  scale_y_continuous(limits = c(-max(grafico_CNVTM$count), max(grafico_CNVTM$count))) +
+  scale_fill_manual(values = c("tomato2" , "skyblue1")) +
+  theme_minimal() +
+  scale_x_discrete(labels = c("ADH\n(n = 321)", "ANX\n(n = 431)", "MDD\n(n = 367)", "Control\n(n = 1170)")) +
+  labs(title = "CNVs across psychiatric phenotype", # Título, subtítulo, legenda e eixos
+       x = "Psychiatric Phenotype", 
+       y = "Deletions              Duplications")
+
+## porcentagem
+
+ADHD_del_uniq <- unique(ADHD_C_del$subjectid)
+ADHD_dup_uniq <- unique(ADHD_C_dup$subjectid)
+ANX_del_uniq <- unique(ANX_C_del$subjectid)
+ANX_dup_uniq <- unique(ANX_C_dup$subjectid)
+MDD_del_uniq <- unique(MDD_C_del$subjectid)
+MDD_dup_uniq <- unique(MDD_C_dup$subjectid)
+control_del_uniq <- unique(control_C_del$subjectid)
+control_dup_uniq <- unique(control_C_dup$subjectid)
+
+
+
+perc <- c(65.42, 59.81, 64.96, 44.54, 64.85, 58.31, 64.44, 56.06)
+deldup <- c("del", "dup", "del", "dup", "del", "dup", "del", "dup")
+vet <- c("ADHD", "ADHD", "ANX", "ANX", "MDD", "MDD", "control", "control")
+grafico_CNVTM_perc <- data.frame(vet,perc,deldup)
+
+grafico_CNVTM_perc$vet <- factor(grafico_CNVTM$vet,levels = c("ADHD", "ANX", "MDD", "control"))
+
+ggplot(grafico_CNVTM_perc,aes(x=vet, y = ifelse(deldup == "dup", perc, -perc), fill=deldup)) +
+  geom_col()+
+  scale_y_continuous(limits = c(-max(grafico_CNVTM_perc$perc), max(grafico_CNVTM_perc$perc))) +
+  scale_fill_manual(values = c("tomato2" , "skyblue1")) +
+  theme_minimal() +
+  scale_x_discrete(labels = c("ADHD\n(n = 321)", "ANX\n(n = 431)", "MDD\n(n = 367)", "Control\n(n = 1170)")) +
+  labs(title = "Percentage of CNVs carriers across psychiatric phenotypes", # Título, subtítulo, legenda e eixos
+       x = "Psychiatric Phenotypes", 
+       y = "Deletions              Duplications")
