@@ -20,10 +20,7 @@ cd gatk-4.2.0.0/
 
 # Pegar dados do cerebro
 scp escience@172.23.16.216:/genetica_1/Genotipagem_INPD_Broad2019/PGC_NIMH_Salum_PTSD_GSA-MD_v1_3/RP-1194/processamento_inpd2019/proc_inicial_5548inds_dez19/INPD_GenoBroad19_11.vcf.gz ./IC_JA/
-senha: escience
-
 scp i123@172.23.16.216:/media/i123/genetica_1/Genotipagem_INPD_Broad2019/PGC_NIMH_Salum_PTSD_GSA-MD_v1_3/RP-1194/processamento_inpd2019/proc_inicial_5548inds_dez19/INPD_GenoBroad19_10.vcf.gz ./julia.arendt/IC_JA/
-senha: 123456
 
 ### (scp quem praonde)
 
