@@ -30,3 +30,9 @@ for i in {11..11}; do ls INPD_${i}_ref* > IDs_INPD_${i} ; done
 # Criar pfb unico
 
 ## head -n 250 IDs_INPD_11 > IDs_ParaPFB
+
+## Na pasta gatk 
+
+for i in {10..10}; do detect_cnv_header.pl -test -hmm /home/julia.arendt/IC_JA/PennCNV-1.0.5/lib/hhall.hmm -pfb /home/julia.arendt/IC_JA/gatk-4.2.0.0/INPD.pfb -list /home/julia.arendt/IC_JA/gatk-4.2.0.0/IDs_INPD_10 -log INPD10.log -out INPD10.rawcnv; done
+
+
