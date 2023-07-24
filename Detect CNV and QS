@@ -1,0 +1,3 @@
+bash process_penncnv_docker_my_input.sh #change the input and output
+
+bash run_penncnv_docker.sh #inside docker, change the paths
