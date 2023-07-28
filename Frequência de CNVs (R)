@@ -21,7 +21,7 @@ write.table(modifier_dup, "dup_INPD_filtered.txt", quote = F, sep = "\t", col.na
 Definir CNVRs na Amostra
 Importar informações do PFB
 axiompmda_markers <- read_finalreport_snps(INPD.pfb, mark_ID_col = "Name", chr_col = "Chr", pos_col = "Position")
-sample_INPD <- as.data.table(cbind(unique(modifiersCNV$AG), c(0), c(0), c(0)))
+sample_INPD <- as.data.table(cbind(unique(modifiersCNV$ID), c(0), c(0), c(0)))
 colnames(sample_INPD) <- c("sample_ID", "sex", "role", "fam_ID" )
 
 Converter para o formato de input do CNVgears
