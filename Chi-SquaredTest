@@ -1,0 +1,218 @@
+#### Julia Arendt 04.08.2023
+#### Chi-Squared test
+
+library(dplyr)
+
+sample <- read.table("C:/Users/RJulia/OneDrive/Documents/Analysis_BHRC_article1/sample")
+sample_C <- sample[sample$CMP == "C",]
+
+overlap_50_C <- read.table("C:/Users/RJulia/OneDrive/Documents/Analysis_BHRC_article1/overlap_pheno_C", header = TRUE)
+overlap_50_C$Região <- gsub("del", "", overlap_50_C$Região)
+overlap_50_C$Região <- gsub("dup", "", overlap_50_C$Região)
+overlap_50_C$Region <- paste(overlap_50_C$Região, overlap_50_C$state)
+overlap_50_C <- join_all(list(overlap_50_C, sample_C), by="Samples", type="full")
+
+pheno <- read.table("C:/Users/RJulia/OneDrive/Documents/CNVburden/Pheno_Probands_Sep20_PGC.txt", header=TRUE)
+colnames(pheno) [1] <- "Samples"
+
+# YES and NO columns: CNV type
+
+overlap_sample$del_1q21.1 <- ifelse(overlap_sample$Samples %in% sample_C$Samples & overlap_sample$Region %in% "1q21.1 del", "YES", "NO")
+
+overlap_sample$del_1q21.1 <- ifelse(overlap_sample$Region == "1q21.1  del", "YES", "NO")
+
+overlap_sample$dup_2q13 <- ifelse(overlap_sample$Region == "2q13  dup", "YES", "NO")
+
+overlap_sample$dup_2q11.2 <- ifelse(overlap_sample$Region == "2q11.2  dup", "YES", "NO")
+
+overlap_sample$del_7q11.21 <- ifelse(overlap_sample$Region == "7q11.21  del", "YES", "NO")
+
+overlap_sample$dup_7q11.21 <- ifelse(overlap_sample$Region == "7q11.21  dup", "YES", "NO")
+
+overlap_sample$dup_9q34 <- ifelse(overlap_sample$Region == "9q34  dup", "YES", "NO")
+
+overlap_sample$dup_10q26.3 <- ifelse(overlap_sample$Region == "10q26.3  dup", "YES", "NO")
+
+overlap_sample$del_15q13.3 <- ifelse(overlap_sample$Region == "15q13.3  del", "YES", "NO")
+
+overlap_sample$del_15q11.2 <- ifelse(overlap_sample$Region == "15q11.2  del", "YES", "NO")
+
+overlap_sample$dup_15q11.2 <- ifelse(overlap_sample$Region == "15q11.2  dup", "YES", "NO")
+
+overlap_sample$dup_16p12.1 <- ifelse(overlap_sample$Region == "16p12.1  dup", "YES", "NO")
+
+overlap_sample$dup_16p11.2 <- ifelse(overlap_sample$Region == "16p11.2  dup", "YES", "NO")
+
+overlap_sample$del_16p12.1 <- ifelse(overlap_sample$Region == "16p12.1  del", "YES", "NO")
+
+overlap_sample$dup_16p13.11 <- ifelse(overlap_sample$Region == "16p13.11  dup", "YES", "NO")
+
+overlap_sample$del_16p13.11 <- ifelse(overlap_sample$Region == "16p13.11  del", "YES", "NO")
+
+overlap_sample$dup_22q11.2 <- ifelse(overlap_sample$Region == "22q11.2  dup", "YES", "NO")
+
+overlap_sample <- overlap_sample[,c(3,29:45)]
+
+overlap_sample$del_1q21.1 <- ifelse(is.na(overlap_sample$del_1q21.1), "NO", overlap_sample$del_1q21.1)
+
+overlap_sample$dup_2q13 <- ifelse(is.na(overlap_sample$dup_2q13), "NO", overlap_sample$dup_2q13)
+
+overlap_sample$dup_2q11.2 <- ifelse(is.na(overlap_sample$dup_2q11.2), "NO", overlap_sample$dup_2q11.2)
+
+overlap_sample$del_7q11.21 <- ifelse(is.na(overlap_sample$del_7q11.21), "NO", overlap_sample$del_7q11.21)
+
+overlap_sample$dup_7q11.21 <- ifelse(is.na(overlap_sample$dup_7q11.21), "NO", overlap_sample$dup_7q11.21)
+
+overlap_sample$dup_9q34 <- ifelse(is.na(overlap_sample$dup_9q34), "NO", overlap_sample$dup_9q34)
+
+overlap_sample$dup_10q26.3 <- ifelse(is.na(overlap_sample$dup_10q26.3), "NO", overlap_sample$dup_10q26.3)
+
+overlap_sample$del_15q13.3 <- ifelse(is.na(overlap_sample$del_15q13.3), "NO", overlap_sample$del_15q13.3)
+
+overlap_sample$del_15q11.2 <- ifelse(is.na(overlap_sample$del_15q11.2), "NO", overlap_sample$del_15q11.2)
+
+overlap_sample$dup_15q11.2 <- ifelse(is.na(overlap_sample$dup_15q11.2), "NO", overlap_sample$dup_15q11.2)
+
+overlap_sample$dup_16p12.1 <- ifelse(is.na(overlap_sample$dup_16p12.1), "NO", overlap_sample$dup_16p12.1)
+
+overlap_sample$dup_16p11.2 <- ifelse(is.na(overlap_sample$dup_16p11.2), "NO", overlap_sample$dup_16p11.2)
+
+overlap_sample$del_16p12.1 <- ifelse(is.na(overlap_sample$del_16p12.1), "NO", overlap_sample$del_16p12.1)
+
+overlap_sample$dup_16p13.11 <- ifelse(is.na(overlap_sample$dup_16p13.11), "NO", overlap_sample$dup_16p13.11)
+
+overlap_sample$del_16p13.11 <- ifelse(is.na(overlap_sample$del_16p13.11), "NO", overlap_sample$del_16p13.11)
+
+overlap_sample$dup_22q11.2 <- ifelse(is.na(overlap_sample$dup_22q11.2), "NO", overlap_sample$dup_22q11.2)
+
+# overlap_pheno <- join_all(list(overlap_sample, pheno), by="Samples", type = "right")
+
+
+reg_all <- join_all(list(overlap_sample, C_included), by="Samples", type = "right")
+
+reg_pheno_final <- join_all(list(reg_all,pheno), by="Samples", type = "inner")
+
+reg_pheno_final$del_1q21.1 <- ifelse(is.na(reg_pheno_final$del_1q21.1), "NO", reg_pheno_final$del_1q21.1)
+
+reg_pheno_final$dup_2q13 <- ifelse(is.na(reg_pheno_final$dup_2q13), "NO", reg_pheno_final$dup_2q13)
+
+reg_pheno_final$dup_2q11.2 <- ifelse(is.na(reg_pheno_final$dup_2q11.2), "NO", reg_pheno_final$dup_2q11.2)
+
+reg_pheno_final$del_7q11.21 <- ifelse(is.na(reg_pheno_final$del_7q11.21), "NO", reg_pheno_final$del_7q11.21)
+
+reg_pheno_final$dup_7q11.21 <- ifelse(is.na(reg_pheno_final$dup_7q11.21), "NO", reg_pheno_final$dup_7q11.21)
+
+reg_pheno_final$dup_9q34 <- ifelse(is.na(reg_pheno_final$dup_9q34), "NO", reg_pheno_final$dup_9q34)
+
+reg_pheno_final$dup_10q26.3 <- ifelse(is.na(reg_pheno_final$dup_10q26.3), "NO", reg_pheno_final$dup_10q26.3)
+
+reg_pheno_final$del_15q13.3 <- ifelse(is.na(reg_pheno_final$del_15q13.3), "NO", reg_pheno_final$del_15q13.3)
+
+reg_pheno_final$del_15q11.2 <- ifelse(is.na(reg_pheno_final$del_15q11.2), "NO", reg_pheno_final$del_15q11.2)
+
+reg_pheno_final$dup_15q11.2 <- ifelse(is.na(reg_pheno_final$dup_15q11.2), "NO", reg_pheno_final$dup_15q11.2)
+
+reg_pheno_final$dup_16p12.1 <- ifelse(is.na(reg_pheno_final$dup_16p12.1), "NO", reg_pheno_final$dup_16p12.1)
+
+reg_pheno_final$dup_16p11.2 <- ifelse(is.na(reg_pheno_final$dup_16p11.2), "NO", reg_pheno_final$dup_16p11.2)
+
+reg_pheno_final$del_16p12.1 <- ifelse(is.na(reg_pheno_final$del_16p12.1), "NO", reg_pheno_final$del_16p12.1)
+
+reg_pheno_final$dup_16p13.11 <- ifelse(is.na(reg_pheno_final$dup_16p13.11), "NO", reg_pheno_final$dup_16p13.11)
+
+reg_pheno_final$del_16p13.11 <- ifelse(is.na(reg_pheno_final$del_16p13.11), "NO", reg_pheno_final$del_16p13.11)
+
+reg_pheno_final$dup_22q11.2 <- ifelse(is.na(reg_pheno_final$dup_22q11.2), "NO", reg_pheno_final$dup_22q11.2)
+
+# Phenotype manipulation
+
+overlap_pheno$scontrole <- overlap_pheno[,c(24)]
+overlap_pheno$scontrole <- gsub("1", "YES", overlap_pheno$controle)
+overlap_pheno$scontrole <- gsub("2", "NO", overlap_pheno$controle)
+overlap_pheno$scontrole <- ifelse(is.na(overlap_pheno$controle), "NO", overlap_pheno$scontrole)
+
+overlap_pheno$ctrlANX <- overlap_pheno[,c(19)]
+overlap_pheno$ctrlMDD <- overlap_pheno[,c(23)]
+overlap_pheno$ctrlADHD <- overlap_pheno[,c(22)]
+overlap_pheno$ctrlPTSD <- overlap_pheno[,c(21)]
+overlap_pheno$ctrlBD <- overlap_pheno[,c(20)]
+
+overlap_pheno$ANX <- gsub("2","YES", overlap_pheno$ANX)
+overlap_pheno$ANX <- gsub("1","NO", overlap_pheno$ANX)
+overlap_pheno$ANX <- gsub("-9","NO", overlap_pheno$ANX)
+
+overlap_pheno$MDD <- gsub("2","YES", overlap_pheno$MDD)
+overlap_pheno$MDD <- gsub("1","NO", overlap_pheno$MDD)
+overlap_pheno$MDD <- gsub("-9","NO", overlap_pheno$MDD)
+
+overlap_pheno$ADHD <- gsub("2","YES", overlap_pheno$ADHD)
+overlap_pheno$ADHD <- gsub("1","NO", overlap_pheno$ADHD)
+overlap_pheno$ADHD <- gsub("-9","NO", overlap_pheno$ADHD)
+
+overlap_pheno$PTSD <- gsub("2","YES", overlap_pheno$PTSD)
+overlap_pheno$PTSD <- gsub("1","NO", overlap_pheno$PTSD)
+overlap_pheno$PTSD <- gsub("-9","NO", overlap_pheno$PTSD)
+
+overlap_pheno$BD <- gsub("2","YES", overlap_pheno$BD)
+overlap_pheno$BD <- gsub("1","NO", overlap_pheno$BD)
+overlap_pheno$BD <- gsub("-9","NO", overlap_pheno$BD)
+
+
+overlap_pheno$ctrlANX <- gsub("2","NO", overlap_pheno$ctrlANX)
+overlap_pheno$ctrlANX <- gsub("1","YES", overlap_pheno$ctrlANX)
+overlap_pheno$ctrlANX <- gsub("-9","YES", overlap_pheno$ctrlANX)
+
+overlap_pheno$ctrlADHD <- gsub("2","NO", overlap_pheno$ctrlADHD)
+overlap_pheno$ctrlADHD <- gsub("1","YES", overlap_pheno$ctrlADHD)
+overlap_pheno$ctrlADHD <- gsub("-9","YES", overlap_pheno$ctrlADHD)
+
+overlap_pheno$ctrlMDD <- gsub("2","NO", overlap_pheno$ctrlMDD)
+overlap_pheno$ctrlMDD <- gsub("1","YES", overlap_pheno$ctrlMDD)
+overlap_pheno$ctrlMDD <- gsub("-9","YES", overlap_pheno$ctrlMDD)
+
+overlap_pheno$ctrlPTSD <- gsub("2","NO", overlap_pheno$ctrlPTSD)
+overlap_pheno$ctrlPTSD <- gsub("1","YES", overlap_pheno$ctrlPTSD)
+overlap_pheno$ctrlPTSD <- gsub("-9","YES", overlap_pheno$ctrlPTSD)
+
+overlap_pheno$ctrlBD <- gsub("2","NO", overlap_pheno$ctrlBD)
+overlap_pheno$ctrlBD <- gsub("1","YES", overlap_pheno$ctrlBD)
+overlap_pheno$ctrlBD <- gsub("-9","YES", overlap_pheno$ctrlBD)
+
+write.table(overlap_pheno, "yesno_cnv_pheno.txt", quote = FALSE)
+
+# A table with each phenotype without -9 and Chi-Squared Test
+
+## Only ANX, ADHD and MDD
+
+reg_pheno_final <- reg_pheno_final[,-c(2)]
+
+ANX_reg <- reg_pheno_final[reg_pheno_final$ANX == 1 | reg_pheno_final$ANX == 2,]
+
+ANX_reg <- ANX_reg[,-c(1,14,19:23)] #  Remove also regions with no representants with "YES"
+
+CHIS_ANX <- lapply(ANX_reg[,-16], function(x) chisq.test(ANX_reg[,16], x)); CHIS_ANX
+
+final_ANX_CHIS <- do.call(rbind, CHIS_ANX)[,c(1,3)]
+
+
+MDD_reg <- reg_pheno_final[reg_pheno_final$MDD == 1 | reg_pheno_final$MDD == 2,]
+
+MDD_reg <- MDD_reg[,-c(1,9,18:21,23)]
+
+CHIS_MDD <- lapply(MDD_reg[,-16], function(x) chisq.test(MDD_reg[,16], x)); CHIS_ANX
+
+final_MDD_CHIS <- do.call(rbind, CHIS_MDD)[,c(1,3)]
+
+
+ADHD_reg <- reg_pheno_final[reg_pheno_final$ADHD == 1 | reg_pheno_final$ADHD == 2,]
+
+ADHD_reg <- ADHD_reg[,-c(1,14,18:20,22,23)]
+
+CHIS_ADHD <- lapply(ADHD_reg[,-16], function(x) chisq.test(ADHD_reg[,16], x)); CHIS_ADHD
+
+final_ADHD_CHIS <- do.call(rbind, CHIS_ADHD)[,c(1,3)]
+
+
+
+
+
