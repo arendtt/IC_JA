@@ -1,12 +1,413 @@
-#### Julia Arendt 04.08.2023
-#### Chi-Squared test
+---
+title: "Pathogenics" 
+author: Julia Arendt
+format: html
+editor_options: 
+  chunk_output_type: console
+---
 
+```{r}
+library(openxlsx)
+library(stringr)
+library(fuzzyjoin)
 library(dplyr)
+library(purrr)
+library(plyr)
+library(tidyverse)
+library(ggplot2)
+library(scales)
+library(RColorBrewer)
+```
 
-sample <- read.table("C:/Users/RJulia/OneDrive/Documents/Analysis_BHRC_article1/sample")
-sample_C <- sample[sample$CMP == "C",]
+# 1. Inherited and *de novo*
 
-overlap_50_C <- read.table("C:/Users/RJulia/OneDrive/Documents/Analysis_BHRC_article1/overlap_pheno_C", header = TRUE)
+```{r}
+pathogenics_50 <- read.table("../Analysis_BHRC_article1/overlap_final_50")
+trios <- read.table ("../Trios/Trios.rds")
+colnames(trios) [5]<- "FID"
+```
+
+```{r}
+pathogenics_trios <- join_all(list(pathogenics_50, trios), by="FID", type="inner")
+pathogenics_del_trios <- pathogenics_trios[pathogenics_trios$state == "del",]
+pathogenics_dup_trios <- pathogenics_trios[pathogenics_trios$state == "dup",]
+```
+
+```{r}
+pathogenics_del_trios_C <- pathogenics_del_trios[pathogenics_del_trios$CMP=="C",]
+pathogenics_del_trios_M <- pathogenics_del_trios[pathogenics_del_trios$CMP=="M",]
+pathogenics_del_trios_P <- pathogenics_del_trios[pathogenics_del_trios$CMP=="P",]
+
+pathogenics_dup_trios_C <- pathogenics_dup_trios[pathogenics_dup_trios$CMP=="C",]
+pathogenics_dup_trios_M <- pathogenics_dup_trios[pathogenics_dup_trios$CMP=="M",]
+pathogenics_dup_trios_P <- pathogenics_dup_trios[pathogenics_dup_trios$CMP=="P",]
+```
+
+```{r}
+pathogenic_del_trios_CM_all <- genome_inner_join(pathogenics_del_trios_C, pathogenics_del_trios_M, by=c("Chr.x", "Start.x", "End.x"))
+pathogenics_herd_del_CM <- pathogenic_del_trios_CM_all[pathogenic_del_trios_CM_all$FID.x == pathogenic_del_trios_CM_all$FID.y ,]
+
+pathogenic_del_trios_CP_all <- genome_inner_join(pathogenics_del_trios_C, pathogenics_del_trios_P, by=c("Chr.x", "Start.x", "End.x"))
+pathogenics_herd_del_CP <- pathogenic_del_trios_CP_all[pathogenic_del_trios_CP_all$FID.x == pathogenic_del_trios_CP_all$FID.y ,]
+
+pathogenic_dup_trios_CM_all <- genome_inner_join(pathogenics_dup_trios_C, pathogenics_dup_trios_M, by=c("Chr.x", "Start.x", "End.x"))
+pathogenics_herd_dup_CM <- pathogenic_dup_trios_CM_all[pathogenic_dup_trios_CM_all$FID.x == pathogenic_dup_trios_CM_all$FID.y ,]
+
+pathogenic_dup_trios_CP_all <- genome_inner_join(pathogenics_dup_trios_C, pathogenics_dup_trios_P, by=c("Chr.x", "Start.x", "End.x"))
+pathogenics_herd_dup_CP <- pathogenic_dup_trios_CP_all[pathogenic_dup_trios_CP_all$FID.x == pathogenic_dup_trios_CP_all$FID.y ,]
+```
+
+```{r}
+pathogenics_del_trios_CMP_herd <- rbind(pathogenics_herd_del_CM, pathogenics_herd_del_CP)
+pathogenics_dup_trios_CMP_herd <- rbind(pathogenics_herd_dup_CM, pathogenics_herd_dup_CP)
+pathogenics_deldup_trios_CMP_herd <- rbind(pathogenics_del_trios_CMP_herd, pathogenics_dup_trios_CMP_herd)
+```
+
+```{r}
+pathogenics_deldup_trios_C <- pathogenics_trios[pathogenics_trios$CMP=="C",]
+
+n_cnvs_total <- nrow(pathogenics_deldup_trios_C)
+n_cnvs_herd <- nrow(pathogenics_deldup_trios_CMP_herd)
+n_cnvs_denovo <- n_cnvs_total - n_cnvs_herd
+
+(perc_herd <- round(n_cnvs_herd*100/n_cnvs_total, 2))
+(perc_denovo <- round(n_cnvs_denovo*100/n_cnvs_total, 2))
+```
+
+# 2. Clean controls
+
+## everControlGroup: Control (proband and mother without disorder), Not Control (proband and mother with any disorder)
+
+## geral_junto_semfiltro: table with all probands, but without who had the MINI answered by the father
+
+```{r}
+geral_junto_W012_2 <- readRDS("~/Clean_controls_analysis/geral_junto_W012_2.rds")
+geral_junto_W012 <- readRDS("~/Clean_controls_analysis/geral_junto_W012.rds")
+geral_junto_semfiltro <- readRDS("~/Clean_controls_analysis/geral_junto_semfiltro.rds")
+geral <- readRDS("~/Clean_controls_analysis/Julia_W02.rds") # who appeared in W0 and W2 or W0, W1, W2
+```
+
+```{r}
+clean_pheno <- join_all(list(geral, geral_junto_semfiltro), by="IID", type="inner")
+table(clean_pheno$everControlGroup)
+clean_pheno <- clean_pheno[,c(1,5,6,167,173,174)]
+```
+
+# 3. CNVburden
+
+```{r}
+cnv_filtered_cleaned <- read.table("cnv_detected_filtered_cleaned")
+
+cnv_filtered_cleaned <- cnv_filtered_cleaned[,c(2:5,13,42,48,49)]
+colnames(cnv_filtered_cleaned)[5] <- "length"
+colnames(cnv_filtered_cleaned)[6] <- "IID"
+
+cnv_filtered_cleaned$length <- as.numeric(cnv_filtered_cleaned$length)
+```
+
+```{r}
+CNVburden <- cbind(aggregate(length ~ IID, cnv_filtered_cleaned, sum ))
+```
+
+```{r}
+C_CNVburden <- CNVburden[grepl("C", CNVburden$IID),]
+M_CNVburden <- CNVburden[grepl("M",CNVburden$IID),]
+```
+
+```{r}
+C_CNVburden_pheno <- join_all(list(C_CNVburden, clean_pheno), by = "IID", type = "right")
+
+C_CNVburden_pheno$length[is.na(C_CNVburden_pheno$length)] <- 0
+```
+
+```{r}
+mama_MINI <- read.table("../Graphics_Article1/mama_MINI")
+M_CNVburden_pheno <- join_all(list(M_CNVburden, mama_MINI), by = "IID", type = "right")
+```
+
+## Graphs
+
+```{r}
+colnames(BHRCS_Educ_Cog_w0w1w2) [2] <- "IID"
+
+W0 <- BHRCS_Educ_Cog_w0w1w2 [BHRCS_Educ_Cog_w0w1w2$redcap_event_name == "wave0_arm_1",]
+W1 <- BHRCS_Educ_Cog_w0w1w2 [BHRCS_Educ_Cog_w0w1w2$redcap_event_name == "wave1_arm_1",]
+W2 <- BHRCS_Educ_Cog_w0w1w2 [BHRCS_Educ_Cog_w0w1w2$redcap_event_name == "wave2_arm_1",]
+```
+
+### Proband pheno
+
+```{r}
+ggplot(na.omit(C_CNVburden_pheno)) +
+  geom_boxplot(aes(x = everControlGroup, y= length, fill=everControlGroup)) +
+  labs(title = "Probandos: CNVburden in Control and Not Control groups",
+       y="CNVburden",
+       x="Phenotype") +
+  scale_y_continuous(labels = label_number(),limits = c(1000000,15000000)) +
+  scale_fill_brewer(palette = "Set2") +
+  guides(fill = FALSE) + 
+  geom_point(aes(x = everControlGroup, y= length))+
+  scale_fill_brewer(palette="Blues") +
+  theme_minimal()
+```
+
+```{r}
+t.test(as.numeric(W2_C_CNVburden$length > 2000000) ~ W2_C_CNVburden$everControl)
+```
+
+### Ocupation (NEET_15: neet from 15 yo / W2: last wave)
+
+```{r}
+
+C_CNVburden_pheno$IID <- gsub("C", "", C_CNVburden_pheno$IID)
+
+W2_C_CNVburden <- join_all(list(C_CNVburden_pheno, W2), by = "IID")
+
+W2_C_CNVburden <- mutate(W2_C_CNVburden,
+                          NEET_15 = factor(NEET_15, labels=c("Yes", "No")))
+
+W2_C_CNVburden %>% drop_na(NEET_15) %>% 
+  ggplot() + 
+  geom_boxplot(aes(x = NEET_15, y= length, fill= NEET_15)) +
+  labs(title = "Probands: CNVburden and occupation",
+       y="CNVburden",
+       x="In Education, Employment or Training from 15 yo") +
+  scale_y_continuous(labels = label_number(),limits = c(1000000,9000000)) +
+  scale_fill_brewer(palette = "Set3") +
+  guides(fill = FALSE) + # remove a legenda
+  theme_minimal()
+
+```
+
+### IQ
+
+```{r}
+W0_C_CNVburden <- join_all(list(C_CNVburden_pheno, W0), by = "IID")
+
+W0_C_CNVburden <- mutate(W0_C_CNVburden,
+                          IQ_group = factor(IQ_group, labels=c("Below Average", "Average", "Above Average")))
+
+W0_C_CNVburden %>% drop_na(IQ_group) %>% 
+  ggplot() + 
+  geom_boxplot(aes(x = IQ_group, y= length, fill= IQ_group)) +
+  labs(title = "Probandos: CNV burden and IQ",
+       y="CNVburden",
+       x="IQ group") +
+  scale_y_continuous(labels = label_number(),limits = c(1000000,15000000)) +
+  scale_fill_brewer(palette = "Set") +
+  guides(fill = FALSE) + # remove a legenda
+  theme_minimal()
+```
+
+```{r}
+ggplot(W0_C_CNVburden, aes(x = IQ, y = length)) +
+  geom_point() +
+  geom_smooth(aes(x = IQ, y = length),
+              se = FALSE,
+              method = "lm") +
+  ggtitle("IQ and CNVburden") + 
+  ylab("CNVburden") +
+  xlab("IQ") +
+  scale_y_continuous(labels = label_number(), limits = c(2000000,15000000)) +
+  theme_minimal()
+```
+
+### Executive Function
+
+```{r}
+W1_C_CNVburden <- join_all(list(C_CNVburden_pheno, W1), by = "IID")
+
+ggplot(W1_C_CNVburden, aes(x = ef_fl, y = length)) +
+       geom_point() +
+       geom_smooth(aes(x = ef_fl, y = length),
+                                     se = FALSE,
+                                     method = "lm") +
+       ggtitle("Função executiva em relação ao CNV burden") + 
+       ylab("CNV burden") +
+       xlab("Função executiva") +
+       scale_y_continuous(labels = label_number(), limits = c(2000000,15000000)) +
+       theme_minimal()
+```
+
+### Whrite skill
+
+```{r}
+ggplot(W1_C_CNVburden, aes(x = tde_write, y = length)) +
+  geom_point() +
+  geom_smooth(aes(x = tde_write, y = length),
+              se = FALSE,
+              method = "lm") +
+  ggtitle("Habilidade de escrita em relação ao CNV burden") + 
+  ylab("CNV burden") +
+  xlab("Escore de habilidade de escrita") +
+  scale_y_continuous(labels = label_number(), ) +
+  theme_minimal()
+```
+
+### Read skill
+
+```{r}
+ggplot(W1_C_CNVburden, aes(x = tde_read, y = length)) +
+  geom_point() +
+  geom_smooth(aes(x = tde_write, y = length),
+              se = FALSE,
+              method = "lm") +
+  ggtitle("Habilidade de escrita em relação ao CNV burden") + 
+  ylab("CNV burden") +
+  xlab("Escore de habilidade de escrita") +
+  scale_y_continuous(labels = label_number(), ) +
+  theme_minimal()
+```
+
+#### CNVburden without outlier
+
+```{r}
+colnames(BHRCS_Educ_Cog_w0w1w2) [2] <- "IID"
+
+W0 <- BHRCS_Educ_Cog_w0w1w2 [BHRCS_Educ_Cog_w0w1w2$redcap_event_name == "wave0_arm_1",]
+W1 <- BHRCS_Educ_Cog_w0w1w2 [BHRCS_Educ_Cog_w0w1w2$redcap_event_name == "wave1_arm_1",]
+W2 <- BHRCS_Educ_Cog_w0w1w2 [BHRCS_Educ_Cog_w0w1w2$redcap_event_name == "wave2_arm_1",]
+```
+
+### Proband pheno
+
+```{r}
+ggplot(na.omit(C_CNVburden_pheno_wooutlier)) +
+  geom_boxplot(aes(x = everControlGroup, y= length, fill=everControlGroup)) +
+  labs(y="CNVburden",
+       x="Phenotype") +
+  scale_y_continuous(labels = label_number(),limits = c(1000000,15000000)) +
+  scale_fill_brewer(palette = "Set2") +
+  guides(fill = FALSE) + 
+  geom_point(aes(x = everControlGroup, y= length)) +
+  scale_fill_brewer(palette="Blues") +
+  theme_minimal() 
+```
+
+```{r}
+ggplot(na.omit(C_CNVburden_pheno_wooutlier)) +
+  geom_boxplot(aes(x = new, y= length, fill= new)) +
+  labs(y="CNVburden",
+       x="Psychiatric Phenotype") +
+  scale_y_continuous(labels = label_number(),limits = c(1000000,7500000)) +
+  scale_fill_brewer(palette = "Set2") +
+  guides(fill = FALSE) + 
+  geom_point(aes(x = new, y= length))+
+  scale_fill_manual(values= c("#FA8A8A", "#FCBCBC", "#FDD7D7")) +
+  theme_minimal()
+```
+
+### Ocupation (NEET_15: neet from 15 yo / W2: last wave)
+
+```{r}
+
+C_CNVburden_pheno$IID <- gsub("C", "", C_CNVburden_pheno$IID)
+
+W2_C_CNVburden <- join_all(list(C_CNVburden_pheno, W2), by = "IID")
+
+W2_C_CNVburden <- mutate(W2_C_CNVburden,
+                          NEET_15 = factor(NEET_15, labels=c("Yes", "No")))
+
+W2_C_CNVburden %>% drop_na(NEET_15) %>% 
+  ggplot() + 
+  geom_boxplot(aes(x = NEET_15, y= length, fill= NEET_15)) +
+  labs(title = "Probands: CNVburden and occupation",
+       y="CNVburden",
+       x="In Education, Employment or Training from 15 yo") +
+  scale_y_continuous(labels = label_number(),limits = c(1000000,9000000)) +
+  scale_fill_brewer(palette = "Set3") +
+  guides(fill = FALSE) + # remove a legenda
+  theme_minimal()
+
+```
+
+### IQ
+
+```{r}
+W0_C_CNVburden <- join_all(list(C_CNVburden_pheno, W0), by = "IID")
+
+W0_C_CNVburden <- mutate(W0_C_CNVburden,
+                          IQ_group = factor(IQ_group, labels=c("Below Average", "Average", "Above Average")))
+
+W0_C_CNVburden %>% drop_na(IQ_group) %>% 
+  ggplot() + 
+  geom_boxplot(aes(x = IQ_group, y= length, fill= IQ_group)) +
+  labs(title = "Probandos: CNV burden and IQ",
+       y="CNVburden",
+       x="IQ group") +
+  scale_y_continuous(labels = label_number(),limits = c(1000000,15000000)) +
+  scale_fill_brewer(palette = "Set") +
+  guides(fill = FALSE) + # remove a legenda
+  theme_minimal()
+```
+
+```{r}
+ggplot(W0_C_CNVburden, aes(x = IQ, y = length)) +
+  geom_point() +
+  geom_smooth(aes(x = IQ, y = length),
+              se = FALSE,
+              method = "lm") +
+  ggtitle("IQ and CNVburden") + 
+  ylab("CNVburden") +
+  xlab("IQ") +
+  scale_y_continuous(labels = label_number(), limits = c(2000000,15000000)) +
+  theme_minimal()
+```
+
+### Executive Function
+
+```{r}
+W1_C_CNVburden <- join_all(list(C_CNVburden_pheno, W1), by = "IID")
+
+ggplot(W1_C_CNVburden, aes(x = ef_fl, y = length)) +
+       geom_point() +
+       geom_smooth(aes(x = ef_fl, y = length),
+                                     se = FALSE,
+                                     method = "lm") +
+       ggtitle("Função executiva em relação ao CNV burden") + 
+       ylab("CNV burden") +
+       xlab("Função executiva") +
+       scale_y_continuous(labels = label_number(), limits = c(2000000,15000000)) +
+       theme_minimal()
+```
+
+### Whrite skill
+
+```{r}
+ggplot(W1_C_CNVburden, aes(x = tde_write, y = length)) +
+  geom_point() +
+  geom_smooth(aes(x = tde_write, y = length),
+              se = FALSE,
+              method = "lm") +
+  ggtitle("Habilidade de escrita em relação ao CNV burden") + 
+  ylab("CNV burden") +
+  xlab("Escore de habilidade de escrita") +
+  scale_y_continuous(labels = label_number(), ) +
+  theme_minimal()
+```
+
+### Read skill
+
+```{r}
+ggplot(W1_C_CNVburden, aes(x = tde_read, y = length)) +
+  geom_point() +
+  geom_smooth(aes(x = tde_write, y = length),
+              se = FALSE,
+              method = "lm") +
+  ggtitle("Habilidade de escrita em relação ao CNV burden") + 
+  ylab("CNV burden") +
+  xlab("Escore de habilidade de escrita") +
+  scale_y_continuous(labels = label_number(), ) +
+  theme_minimal()
+```
+
+# 4. Stats pathogenics
+
+#### Para probandos
+
+# geral = sample_C
+
+```{r}
 overlap_50_C$Região <- gsub("del", "", overlap_50_C$Região)
 overlap_50_C$Região <- gsub("dup", "", overlap_50_C$Região)
 overlap_50_C$Region <- paste(overlap_50_C$Região, overlap_50_C$state)
@@ -16,8 +417,6 @@ pheno <- read.table("C:/Users/RJulia/OneDrive/Documents/CNVburden/Pheno_Probands
 colnames(pheno) [1] <- "Samples"
 
 # YES and NO columns: CNV type
-
-overlap_sample$del_1q21.1 <- ifelse(overlap_sample$Samples %in% sample_C$Samples & overlap_sample$Region %in% "1q21.1 del", "YES", "NO")
 
 overlap_sample$del_1q21.1 <- ifelse(overlap_sample$Region == "1q21.1  del", "YES", "NO")
 
@@ -51,8 +450,6 @@ overlap_sample$del_16p13.11 <- ifelse(overlap_sample$Region == "16p13.11  del", 
 
 overlap_sample$dup_22q11.2 <- ifelse(overlap_sample$Region == "22q11.2  dup", "YES", "NO")
 
-overlap_sample <- overlap_sample[,c(3,29:45)]
-
 overlap_sample$del_1q21.1 <- ifelse(is.na(overlap_sample$del_1q21.1), "NO", overlap_sample$del_1q21.1)
 
 overlap_sample$dup_2q13 <- ifelse(is.na(overlap_sample$dup_2q13), "NO", overlap_sample$dup_2q13)
@@ -85,7 +482,7 @@ overlap_sample$del_16p13.11 <- ifelse(is.na(overlap_sample$del_16p13.11), "NO", 
 
 overlap_sample$dup_22q11.2 <- ifelse(is.na(overlap_sample$dup_22q11.2), "NO", overlap_sample$dup_22q11.2)
 
-# overlap_pheno <- join_all(list(overlap_sample, pheno), by="Samples", type = "right")
+overlap_pheno <- join_all(list(overlap_sample, pheno), by="Samples", type = "right")
 
 
 reg_all <- join_all(list(overlap_sample, C_included), by="Samples", type = "right")
@@ -137,6 +534,12 @@ overlap_pheno$ctrlADHD <- overlap_pheno[,c(22)]
 overlap_pheno$ctrlPTSD <- overlap_pheno[,c(21)]
 overlap_pheno$ctrlBD <- overlap_pheno[,c(20)]
 
+overlap_pheno$ANX <- overlap_pheno[,c(19)]
+overlap_pheno$MDD <- overlap_pheno[,c(23)]
+overlap_pheno$ADHD <- overlap_pheno[,c(22)]
+overlap_pheno$PTSD <- overlap_pheno[,c(21)]
+overlap_pheno$BD <- overlap_pheno[,c(20)]
+
 overlap_pheno$ANX <- gsub("2","YES", overlap_pheno$ANX)
 overlap_pheno$ANX <- gsub("1","NO", overlap_pheno$ANX)
 overlap_pheno$ANX <- gsub("-9","NO", overlap_pheno$ANX)
@@ -156,7 +559,6 @@ overlap_pheno$PTSD <- gsub("-9","NO", overlap_pheno$PTSD)
 overlap_pheno$BD <- gsub("2","YES", overlap_pheno$BD)
 overlap_pheno$BD <- gsub("1","NO", overlap_pheno$BD)
 overlap_pheno$BD <- gsub("-9","NO", overlap_pheno$BD)
-
 
 overlap_pheno$ctrlANX <- gsub("2","NO", overlap_pheno$ctrlANX)
 overlap_pheno$ctrlANX <- gsub("1","YES", overlap_pheno$ctrlANX)
@@ -188,31 +590,51 @@ reg_pheno_final <- reg_pheno_final[,-c(2)]
 
 ANX_reg <- reg_pheno_final[reg_pheno_final$ANX == 1 | reg_pheno_final$ANX == 2,]
 
-ANX_reg <- ANX_reg[,-c(1,14,19:23)] #  Remove also regions with no representants with "YES"
+ANX_reg <- ANX_reg[,c(2:18)] 
 
-CHIS_ANX <- lapply(ANX_reg[,-16], function(x) chisq.test(ANX_reg[,16], x)); CHIS_ANX
+ANX_reg$ANX <- gsub("2","YES", ANX_reg$ANX)
+ANX_reg$ANX <- gsub("1","NO", ANX_reg$ANX)
 
-final_ANX_CHIS <- do.call(rbind, CHIS_ANX)[,c(1,3)]
+ANX_reg_chis <- ANX_reg[vapply(ANX_reg, function(x) length(unique(x)) > 1, logical(1L))]
+
+CHIS_ANX <- lapply(ANX_reg_chis[,-16], function(x) chisq.test(ANX_reg_chis[,16], x)); CHIS_ANX
+
+final_ANX_CHIS <- as.data.frame(do.call(rbind, CHIS_ANX)[,c(1,3)])
+final_ANX_CHIS <- tibble::rownames_to_column(final_ANX_CHIS, "Region")
+
+# write_xlsx(final_ANX_CHIS, "ANX_CHIS.xlsx", format_headers = TRUE)
 
 
 MDD_reg <- reg_pheno_final[reg_pheno_final$MDD == 1 | reg_pheno_final$MDD == 2,]
 
-MDD_reg <- MDD_reg[,-c(1,9,18:21,23)]
+MDD_reg <- MDD_reg[,c(2:17,22)]
 
-CHIS_MDD <- lapply(MDD_reg[,-16], function(x) chisq.test(MDD_reg[,16], x)); CHIS_ANX
+MDD_reg$MDD <- gsub("2","YES", MDD_reg$MDD)
+MDD_reg$MDD <- gsub("1","NO", MDD_reg$MDD)
 
-final_MDD_CHIS <- do.call(rbind, CHIS_MDD)[,c(1,3)]
 
+MDD_reg_chis <- MDD_reg[vapply(MDD_reg, function(x) length(unique(x)) > 1, logical(1L))]
+
+CHIS_MDD <- lapply(MDD_reg_chis[,-16], function(x) chisq.test(MDD_reg_chis[,16], x)); CHIS_MDD
+
+final_MDD_CHIS <- as.data.frame(do.call(rbind, CHIS_MDD)[,c(1,3)])
+final_MDD_CHIS <- tibble::rownames_to_column(final_MDD_CHIS, "Region")
+
+write_xlsx(final_MDD_CHIS, "MDD_CHIS.xlsx", format_headers = TRUE)
 
 ADHD_reg <- reg_pheno_final[reg_pheno_final$ADHD == 1 | reg_pheno_final$ADHD == 2,]
 
-ADHD_reg <- ADHD_reg[,-c(1,14,18:20,22,23)]
+ADHD_reg <- ADHD_reg[,c(2:17,21)]
 
-CHIS_ADHD <- lapply(ADHD_reg[,-16], function(x) chisq.test(ADHD_reg[,16], x)); CHIS_ADHD
+ADHD_reg_chis <- ADHD_reg[vapply(ADHD_reg, function(x) length(unique(x)) > 1, logical(1L))]
 
-final_ADHD_CHIS <- do.call(rbind, CHIS_ADHD)[,c(1,3)]
+CHIS_ADHD <- lapply(ADHD_reg_chis[,-16], function(x) chisq.test(ADHD_reg_chis[,16], x)); CHIS_ADHD
 
+final_ADHD_CHIS <- as.data.frame(do.call(rbind, CHIS_ADHD)[,c(1,3)])
+final_ADHD_CHIS <- tibble::rownames_to_column(final_ADHD_CHIS, "Region")
 
+final_ADHD_CHIS$statistic <- as.numeric(final_ADHD_CHIS$statistic)
+final_ADHD_CHIS$p.value <- round(as.numeric(final_ADHD_CHIS$p.value),3)
 
-
-
+write_xlsx(final_ADHD_CHIS, "ADHD_CHIS.xlsx", format_headers = TRUE)
+```
